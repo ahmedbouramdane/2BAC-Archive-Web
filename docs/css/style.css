@@ -895,6 +895,29 @@ body {
   opacity: 1;
 }
 
+/* ---------- Offline banner ---------- */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: #7f1d1d;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.offline-banner[hidden] {
+  display: none;
+}
+
 /* ---------- Footer ---------- */
 .footer {
   margin-top: auto;

@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="2BAC SM Archive - Cours, séries d'exercices et livres de Mathématiques et Physique-Chimie pour la 2ème année bac sciences mathématiques.">
+  <meta name="theme-color" content="#2563eb">
   <title>2BAC SM Archive</title>
+  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -88,10 +90,30 @@
   </button>
 
   <div class="toast" id="toast"></div>
+  <div class="offline-banner" id="offlineBanner" hidden>
+    <i class="fas fa-wifi"></i> Vous êtes hors ligne — les documents nécessitent une connexion.
+  </div>
 
   <script src="static/index-data.js"></script>
   <script src="js/data.js"></script>
   <script src="js/templates.js"></script>
   <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function (err) {
+          console.warn('Service worker registration failed:', err);
+        });
+      });
+
+      function updateOnlineState() {
+        var banner = document.getElementById('offlineBanner');
+        if (banner) banner.hidden = navigator.onLine;
+      }
+      window.addEventListener('online', updateOnlineState);
+      window.addEventListener('offline', updateOnlineState);
+      updateOnlineState();
+    }
+  </script>
 </body>
 </html>

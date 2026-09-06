@@ -28,6 +28,11 @@ window.TEMPLATES = {
         <h3>Physique &amp; Chimie</h3>
         <p>32 leçons sur les deux semestres : ondes, radioactivité, électricité, mécanique, énergie et plus.</p>
       </a>
+      <a href="#/books" class="subject-card" data-link>
+        <div class="subject-icon"><i class="fas fa-book"></i></div>
+        <h3>Livres</h3>
+        <p>Bibliothèque de livres PDF : cours complets, résumés et exercices corrigés au format livre.</p>
+      </a>
     </div>
   </div>
 </section>
