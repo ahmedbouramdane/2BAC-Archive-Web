@@ -229,17 +229,42 @@ window.INDEX = {
         "modified": "2026-09-05T16:07:56.795468",
         "url": "/static/files/books/math/20260905160756_0edd7d_maxi_maths_2_bac_sm_a_et_b_tome_1.pdf",
         "cover": "/static/files/books/math/20260905160756_0edd7d_maxi_maths_2_bac_sm_a_et_b_tome_1_cover.png"
-      },
-      {
-        "title": "MAXI Math - 2 ABC SM - Tome 1",
-        "filename": "20260905225736_de9f5f_ilide.info-maxi-2bac-math-sm-tome-1.pdf",
-        "size": 71152045,
-        "modified": "2026-09-05T22:57:36.801848",
-        "url": "/static/files/books/math/20260905225736_de9f5f_ilide.info-maxi-2bac-math-sm-tome-1.pdf",
-        "cover": "/static/files/books/math/20260905225736_de9f5f_ilide.info-maxi-2bac-math-sm-tome-1_cover.png"
       }
     ],
-    "pc": []
+    "pc": [
+      {
+        "title": "DIMA DIMA PC - W 2BAC SM TOME 1",
+        "filename": "20260906083609_f0ec2d_dima_dima_physique_chimie_2bac_sm_a_et_b_tome_1.pdf",
+        "size": 45326697,
+        "modified": "2026-09-06T08:36:09.995854",
+        "url": "/static/files/books/pc/20260906083609_f0ec2d_dima_dima_physique_chimie_2bac_sm_a_et_b_tome_1.pdf",
+        "cover": "/static/files/books/pc/20260906083609_f0ec2d_dima_dima_physique_chimie_2bac_sm_a_et_b_tome_1_cover.png"
+      },
+      {
+        "title": "DIMA DIMA PC - 2BAC SM - Tome 2",
+        "filename": "20260906083634_fa9a72_dima_dima_physique_chimie_2bac_sm_a_et_b_tome_2.pdf",
+        "size": 93649843,
+        "modified": "2026-09-06T08:36:34.993622",
+        "url": "/static/files/books/pc/20260906083634_fa9a72_dima_dima_physique_chimie_2bac_sm_a_et_b_tome_2.pdf",
+        "cover": "/static/files/books/pc/20260906083634_fa9a72_dima_dima_physique_chimie_2bac_sm_a_et_b_tome_2_cover.png"
+      },
+      {
+        "title": "AL MOUSSAID PC - 2 BAC SM - Tome 2",
+        "filename": "20260906083943_810bf5_almoussaid_2bac_pc_tome_2_sm.pdf",
+        "size": 54150110,
+        "modified": "2026-09-06T08:39:43.454367",
+        "url": "/static/files/books/pc/20260906083943_810bf5_almoussaid_2bac_pc_tome_2_sm.pdf",
+        "cover": "/static/files/books/pc/20260906083943_810bf5_almoussaid_2bac_pc_tome_2_sm_cover.png"
+      },
+      {
+        "title": "AL MOUSSAID PC - 2 BAC SM - Tome 1",
+        "filename": "20260906085014_9d3b3f_al_moussaid_-_physique_et_chimie_-_2_me_ann_e_baccalaur_at_-_sciences_math_matiques_-_tome_1.pdf",
+        "size": 89885620,
+        "modified": "2026-09-06T08:50:15.030514",
+        "url": "/static/files/books/pc/20260906085014_9d3b3f_al_moussaid_-_physique_et_chimie_-_2_me_ann_e_baccalaur_at_-_sciences_math_matiques_-_tome_1.pdf",
+        "cover": "/static/files/books/pc/20260906085014_9d3b3f_al_moussaid_-_physique_et_chimie_-_2_me_ann_e_baccalaur_at_-_sciences_math_matiques_-_tome_1_cover.png"
+      }
+    ]
   },
-  "generated": "2026-09-06T08:24:13.795564"
+  "generated": "2026-09-06T08:55:29.939151"
 };
