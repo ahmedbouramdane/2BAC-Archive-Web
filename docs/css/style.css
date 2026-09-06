@@ -830,9 +830,45 @@ body {
   margin-top: auto;
   background: var(--card);
   border-top: 1px solid var(--border);
-  padding: 20px 0;
+  padding: 24px 0;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.footer .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.footer-brand {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: 0.4px;
+}
+
+.footer-school {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.footer-school i {
+  color: var(--primary);
+  font-size: 0.85rem;
+}
+
+.footer-credit {
+  font-size: 0.85rem;
+}
+
+.footer-credit .developer {
+  font-weight: 700;
+  color: var(--primary);
 }
 
 /* ---------- App (AJAX content) ---------- */

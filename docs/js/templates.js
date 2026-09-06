@@ -80,7 +80,6 @@ window.TEMPLATES = {
 
   lesson: `<section class="hero hero-inner">
   <div class="container">
-    <p class="crumbs" id="crumbs"></p>
     <h1 id="docTitle"></h1>
     <p class="muted" id="docSubtitle"></p>
   </div>
@@ -120,7 +119,6 @@ window.TEMPLATES = {
 
   "books-list": `<section class="hero hero-inner">
   <div class="container">
-    <p class="crumbs" id="crumbs"></p>
     <h1 id="booksTitle"></h1>
     <p class="muted" id="booksSubtitle"></p>
   </div>

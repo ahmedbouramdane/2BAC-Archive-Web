@@ -7,6 +7,9 @@
   var toastTimeout = null;
   var HIST_KEY = '2bac-recents';
 
+  // Mettez à true pour masquer complètement le menu (header) du site.
+  var HIDE_HEADER = true;
+
   var baseSrc = document.querySelector('script[src*="index-data.js"]');
   var BASE = baseSrc ? baseSrc.src.replace(/\/static\/index-data\.js.*$/, '') : '';
 
@@ -29,6 +32,10 @@
   document.addEventListener('DOMContentLoaded', init);
 
   function init() {
+    if (HIDE_HEADER) {
+      var navbar = document.querySelector('.navbar');
+      if (navbar) navbar.style.display = 'none';
+    }
     initTheme();
     initNav();
     initBackToTop();
@@ -301,11 +308,6 @@
     var typeLabel = TYPES[route.type].label;
     var name = lessonName(route.subject, route.lessonNum);
 
-    document.getElementById('crumbs').innerHTML =
-      '<a href="#/" data-link>Accueil</a> / ' +
-      '<a href="#/' + route.subject + '" data-link>' + esc(subj.name) + '</a> / ' +
-      'Leçon ' + route.lesson + ' / ' + esc(typeLabel);
-
     document.getElementById('docTitle').textContent = name;
     document.getElementById('docSubtitle').textContent =
       subj.name + ' - Leçon ' + route.lessonNum + ' - ' + typeLabel;
@@ -350,11 +352,6 @@
   /* ---------- Books (cover grid) ---------- */
   function renderBooksList(route) {
     var subj = SUBJECTS[route.subject];
-
-    document.getElementById('crumbs').innerHTML =
-      '<a href="#/" data-link>Accueil</a> / ' +
-      '<a href="#/books" data-link>Livres</a> / ' +
-      esc(subj.name);
 
     document.getElementById('booksTitle').textContent = 'Livres - ' + subj.name;
     document.getElementById('booksSubtitle').textContent =
@@ -463,9 +460,6 @@
     var overlay = document.getElementById('pdfOverlay');
 
     document.getElementById('pdfClose').addEventListener('click', closeViewer);
-    document.getElementById('pdfDownload').addEventListener('click', function (e) {
-      if (!PDF_VIEWER.openUrl) e.preventDefault();
-    });
 
     document.addEventListener('keydown', function (e) {
       if (!overlay.hidden && e.key === 'Escape') closeViewer();
@@ -499,10 +493,6 @@
     PDF_VIEWER.openUrl = url;
     PDF_VIEWER.openTitle = title || '';
     document.getElementById('pdfTitle').textContent = title || 'PDF';
-
-    var dl = document.getElementById('pdfDownload');
-    dl.href = fileUrl(url);
-    dl.download = (title || 'document').replace(/\.pdf$/i, '') + '.pdf';
 
     var loading = document.getElementById('pdfLoading');
     var oldFrame = document.getElementById('pdfFrame');

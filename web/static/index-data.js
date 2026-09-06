@@ -1,0 +1,20 @@
+window.INDEX = {
+  "lessons": {
+    "math": {},
+    "pc": {}
+  },
+  "books": {
+    "math": [
+      {
+        "title": "M. Aziz Afaadas 2BAC SM - Algèbre",
+        "filename": "20260906093037_e7b8e8_aziz_afaadas_-_2_bac_sm_alg_bre.pdf",
+        "size": 10410293,
+        "modified": "2026-09-06T09:30:38.082079",
+        "url": "/static/files/books/math/20260906093037_e7b8e8_aziz_afaadas_-_2_bac_sm_alg_bre.pdf",
+        "cover": "/static/files/books/math/20260906093037_e7b8e8_aziz_afaadas_-_2_bac_sm_alg_bre_cover.png"
+      }
+    ],
+    "pc": []
+  },
+  "generated": "2026-09-06T09:31:51.630681"
+};
