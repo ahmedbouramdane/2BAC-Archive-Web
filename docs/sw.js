@@ -4,7 +4,7 @@
  */
 'use strict';
 
-var CACHE_NAME = '2bac-archive-v1';
+var CACHE_NAME = '2bac-archive-v2';
 var APP_SHELL = [
   './',
   './index.html',

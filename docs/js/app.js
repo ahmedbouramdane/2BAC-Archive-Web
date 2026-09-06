@@ -717,11 +717,22 @@
       PDF.page = num;
       pdfUpdateNav();
       pdfRenderWindow();
+      pdfScheduleSavePage();
     }
   }
 
   function pdfUpdateNav() {
-    pdfEl('pdfPageInfo').textContent = (PDF.doc ? PDF.page : 0) + ' / ' + (PDF.doc ? PDF.doc.numPages : 1);
+    var total = PDF.doc ? PDF.doc.numPages : 1;
+    var page = PDF.doc ? PDF.page : 1;
+    var inp = pdfEl('pdfPageInput');
+    if (inp && document.activeElement !== inp) inp.value = String(page);
+    var tot = pdfEl('pdfPageTotal');
+    if (tot) tot.textContent = '/ ' + total;
+    var scr = pdfEl('pdfScrubber');
+    if (scr) {
+      if (String(total) !== scr.max) scr.max = String(total);
+      scr.value = String(page);
+    }
     pdfToggleArrowsDisabled();
   }
 
@@ -738,6 +749,7 @@
     loading.hidden = false;
     pdfEl('pdfOverlay').hidden = false;
     document.body.style.overflow = 'hidden';
+    pdfShowUi();
     pdfToggleDisabled('pdfOpen', false);
     pdfEl('pdfFrameWrap').innerHTML = '';
     cancelPdfRender();
@@ -760,7 +772,8 @@
           loading.hidden = true;
           pdfLayoutSlots();
           pdfRenderWindow();
-          pdfCenterPage(1, false);
+          var last = pdfLoadLastPage();
+          pdfCenterPage(last || 1, false);
           pdfUpdateNav();
         })
         .catch(function () {
@@ -853,6 +866,93 @@
     inner.style.transformOrigin = '';
   }
 
+  /// Floating toolbars: shown while interacting, auto-hidden while reading.
+  var pdfUiTimer = null;
+  function pdfSetUi(show) {
+    pdfEl('pdfOverlay').classList.toggle('pdf-ui-hidden', !show);
+  }
+  function pdfShowUi() {
+    pdfSetUi(true);
+    clearTimeout(pdfUiTimer);
+    pdfUiTimer = setTimeout(function () { pdfSetUi(false); }, 3200);
+  }
+  function pdfToggleUi() {
+    var overlay = pdfEl('pdfOverlay');
+    pdfSetUi(!overlay.classList.contains('pdf-ui-hidden'));
+    clearTimeout(pdfUiTimer);
+  }
+
+  /// Double-tap / double-click: zoom to 2x around the point, back to fit.
+  function pdfDoubleTapZoom(anchor) {
+    if (!PDF.doc || !anchor) return;
+    pdfSetUi(true);
+    if (PDF.zoom > 1.05) pdfZoomTo(1, anchor);
+    else pdfZoomTo(Math.min(PDF_MAX_ZOOM, 2), anchor);
+    pdfShowUi();
+  }
+
+  /* ---------- Full screen ---------- */
+  function pdfIsFs() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+  function pdfUpdateFsIcon() {
+    var b = pdfEl('pdfFullscreen');
+    if (!b) return;
+    var i = b.querySelector('i');
+    if (i) i.className = 'fas ' + (pdfIsFs() ? 'fa-compress' : 'fa-expand');
+  }
+  function pdfToggleFs() {
+    try {
+      if (pdfIsFs()) {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      } else {
+        var o = pdfEl('pdfOverlay');
+        var fn = o.requestFullscreen || o.webkitRequestFullscreen || o.msRequestFullscreen;
+        if (!fn) {
+          showToast('Plein écran non pris en charge sur cet appareil.');
+          return;
+        }
+        fn.call(o);
+      }
+    } catch (e) {
+      showToast('Plein écran non pris en charge sur cet appareil.');
+    }
+  }
+  function pdfRelayoutKeep() {
+    if (pdfEl('pdfOverlay').hidden || !PDF.doc) return;
+    pdfLayoutSlots();
+    pdfRenderWindow();
+    pdfCenterPage(PDF.page, false);
+    pdfUpdateNav();
+  }
+
+  /* ---------- Remember last page ---------- */
+  function pdfStore() {
+    try { return window.localStorage; } catch (e) { return null; }
+  }
+  function pdfLastPageKey() {
+    return 'pdfLastPage:' + PDF.url;
+  }
+  function pdfSaveLastPage() {
+    if (!PDF.doc) return;
+    var s = pdfStore();
+    if (!s) return;
+    try { s.setItem(pdfLastPageKey(), String(PDF.page)); } catch (e) { /* ignore */ }
+  }
+  function pdfLoadLastPage() {
+    var s = pdfStore();
+    if (!s) return null;
+    try {
+      var v = parseInt(s.getItem(pdfLastPageKey()), 10);
+      return (v > 0) ? v : null;
+    } catch (e) { return null; }
+  }
+  var pdfSaveTimer = null;
+  function pdfScheduleSavePage() {
+    clearTimeout(pdfSaveTimer);
+    pdfSaveTimer = setTimeout(pdfSaveLastPage, 250);
+  }
+
   function initViewer() {
     var overlay = pdfEl('pdfOverlay');
     var wrap = pdfEl('pdfFrameWrap');
@@ -865,6 +965,55 @@
     pdfEl('pdfNext').addEventListener('click', function () { pdfGoto(PDF.page + 1); });
     pdfEl('pdfZoomIn').addEventListener('click', function () { pdfZoom(PDF.zoom * 1.25); });
     pdfEl('pdfZoomOut').addEventListener('click', function () { pdfZoom(PDF.zoom * 0.8); });
+    pdfEl('pdfFullscreen').addEventListener('click', pdfToggleFs);
+    document.addEventListener('fullscreenchange', function () {
+      pdfUpdateFsIcon();
+      pdfRelayoutKeep();
+    });
+    document.addEventListener('webkitfullscreenchange', function () {
+      pdfUpdateFsIcon();
+      pdfRelayoutKeep();
+    });
+
+    // Go to a page by editing the number in the bottom toolbar.
+    var pageInput = pdfEl('pdfPageInput');
+    pageInput.addEventListener('focus', function () {
+      clearTimeout(pdfUiTimer);
+      setTimeout(function () { pageInput.select(); }, 0);
+    });
+    pageInput.addEventListener('input', pdfShowUi);
+    pageInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        pageInput.blur();
+      } else if (e.key === 'Escape') {
+        pageInput.value = String(PDF.page);
+        pageInput.blur();
+      }
+    });
+    pageInput.addEventListener('blur', function () {
+      if (!PDF.doc) { pageInput.value = '1'; return; }
+      var v = parseInt(pageInput.value, 10);
+      if (isNaN(v)) pageInput.value = String(PDF.page);
+      else pdfGoto(v);
+      pdfShowUi();
+    });
+
+    // Page scrubber: drag through the document quickly.
+    pdfEl('pdfScrubber').addEventListener('input', function () {
+      if (!PDF.doc) return;
+      var v = parseInt(this.value, 10);
+      if (isNaN(v)) return;
+      v = Math.max(1, Math.min(PDF.doc.numPages, v));
+      if (v !== PDF.page) {
+        PDF.page = v;
+        pdfUpdateNav();
+        pdfRenderWindow();
+        pdfCenterPage(v, false);
+        pdfScheduleSavePage();
+      }
+      pdfShowUi();
+    });
 
     document.addEventListener('keydown', function (e) {
       if (overlay.hidden) return;
@@ -878,8 +1027,12 @@
       }
     });
 
-    // Horizontal scrolling updates the current page (the one at the center).
-    wrap.addEventListener('scroll', pdfOnScroll, { passive: true });
+    // Reading scroll updates the current page (the one at the center) and
+    // briefly wakes the toolbars.
+    wrap.addEventListener('scroll', function () {
+      pdfShowUi();
+      pdfOnScroll();
+    }, { passive: true });
 
     var resizeTimer = null;
     window.addEventListener('resize', function () {
@@ -892,8 +1045,23 @@
       }, 150);
     });
 
-    // Touch: the strip scrolls natively; two-finger pinch zooms.
+    // Desktop: hover reveals the toolbars, leaving hides them.
+    overlay.addEventListener('mouseenter', pdfShowUi);
+    overlay.addEventListener('mouseleave', function () {
+      clearTimeout(pdfUiTimer);
+      pdfSetUi(false);
+    });
+    overlay.addEventListener('mousemove', pdfShowUi);
+    wrap.addEventListener('dblclick', function (e) {
+      if (!PDF.doc) return;
+      var rect = wrap.getBoundingClientRect();
+      pdfDoubleTapZoom(pdfAnchorAtViewport(e.clientX - rect.left, e.clientY - rect.top, PDF.zoom));
+    });
+
+    // Touch: the strip scrolls natively; two-finger pinch zooms; double-tap
+    // toggles zoom; single tap toggles the toolbars.
     var touchStart = null;
+    var lastTap = null;
 
     function pdfTouchDist(touches) {
       var dx = touches[0].clientX - touches[1].clientX;
@@ -914,9 +1082,11 @@
         };
       } else if (e.touches.length < 2) {
         if (!touchStart || touchStart.mode !== 'pinch') {
-          touchStart = { mode: 'none' };
+          var t = e.touches[0];
+          touchStart = { mode: 'none', x: t.clientX, y: t.clientY };
         }
       }
+      pdfShowUi();
     }
 
     function onPdfTouchMove(e) {
@@ -933,6 +1103,25 @@
       if (touchStart && touchStart.mode === 'pinch') {
         pdfClearPreview();
         pdfZoomTo(PDF.zoom, touchStart.anchor);
+        pdfShowUi();
+      } else if (touchStart && touchStart.mode === 'none' && e.changedTouches.length === 1) {
+        var t = e.changedTouches[0];
+        var moved = Math.sqrt((t.clientX - touchStart.x) * (t.clientX - touchStart.x) +
+                              (t.clientY - touchStart.y) * (t.clientY - touchStart.y));
+        if (moved < 14) {
+          var now = Date.now();
+          var rect = wrap.getBoundingClientRect();
+          var anchor = pdfAnchorAtViewport(t.clientX - rect.left, t.clientY - rect.top, PDF.zoom);
+          if (lastTap && (now - lastTap.time) <= 300 &&
+              Math.abs(t.clientX - lastTap.x) <= 46 &&
+              Math.abs(t.clientY - lastTap.y) <= 46) {
+            pdfDoubleTapZoom(anchor);
+            lastTap = null;
+          } else {
+            lastTap = { time: now, x: t.clientX, y: t.clientY };
+            pdfToggleUi();
+          }
+        }
       }
       touchStart = null;
     }
@@ -977,6 +1166,7 @@
   }
 
   function closeViewer() {
+    pdfSaveLastPage();
     pdfEl('pdfOverlay').hidden = true;
     document.body.style.overflow = '';
     cancelPdfRender();
@@ -987,7 +1177,13 @@
     PDF.sizes = [];
     PDF.sizesDone = null;
     pdfEl('pdfFrameWrap').innerHTML = '';
-    pdfEl('pdfPageInfo').textContent = '1 / 1';
+    pdfEl('pdfPageInput').value = '1';
+    pdfEl('pdfPageTotal').textContent = '/ 1';
+    var scr = pdfEl('pdfScrubber');
+    scr.max = '1';
+    scr.value = '1';
+    pdfSetUi(true);
+    pdfUpdateFsIcon();
   }
 
   function showPdfError(msg) {

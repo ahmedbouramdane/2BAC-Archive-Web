@@ -57,19 +57,30 @@
       <div class="pdf-frame-wrap" id="pdfFrameWrap"></div>
     </div>
     <div class="pdf-navbar" id="pdfNavbar">
-      <button class="pdf-tool" id="pdfZoomOut" title="Réduire" aria-label="Réduire">
-        <i class="fas fa-minus"></i>
-      </button>
       <button class="pdf-tool pdf-arrow" id="pdfPrev" title="Page précédente" aria-label="Page précédente">
-        <i class="fas fa-chevron-left"></i>
+        <i class="fas fa-chevron-up"></i>
       </button>
-      <span class="pdf-pagenum" id="pdfPageInfo">1 / 1</span>
+      <div class="pdf-goto">
+        <input class="pdf-page-input" id="pdfPageInput" type="text" inputmode="numeric"
+               autocomplete="off" value="1" aria-label="Aller à la page" title="Saisir un numéro de page et valider">
+        <span class="pdf-page-total" id="pdfPageTotal">/ 1</span>
+      </div>
       <button class="pdf-tool pdf-arrow" id="pdfNext" title="Page suivante" aria-label="Page suivante">
-        <i class="fas fa-chevron-right"></i>
+        <i class="fas fa-chevron-down"></i>
       </button>
-      <button class="pdf-tool" id="pdfZoomIn" title="Agrandir" aria-label="Agrandir">
-        <i class="fas fa-plus"></i>
-      </button>
+      <input type="range" class="pdf-scrubber" id="pdfScrubber" min="1" max="1" value="1"
+             aria-label="Naviguer dans les pages" title="Faire défiler rapidement les pages">
+      <div class="pdf-controls">
+        <button class="pdf-tool pdf-zoom-tool" id="pdfZoomOut" title="Réduire" aria-label="Réduire">
+          <i class="fas fa-minus"></i>
+        </button>
+        <button class="pdf-tool pdf-zoom-tool" id="pdfZoomIn" title="Agrandir" aria-label="Agrandir">
+          <i class="fas fa-plus"></i>
+        </button>
+        <button class="pdf-tool" id="pdfFullscreen" title="Plein écran" aria-label="Plein écran">
+          <i class="fas fa-expand"></i>
+        </button>
+      </div>
     </div>
   </div>
 

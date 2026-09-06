@@ -1,6 +1,7 @@
 :root {
   --bg: #f6f7f9;
   --card: #ffffff;
+  --card-rgb: 255, 255, 255;
   --text: #1d2733;
   --muted: #64748b;
   --border: #dfe3ea;
@@ -15,6 +16,7 @@
 [data-theme="dark"] {
   --bg: #111827;
   --card: #1f2937;
+  --card-rgb: 31, 41, 55;
   --text: #f3f4f6;
   --muted: #9ca3af;
   --border: #374151;
@@ -450,13 +452,20 @@ body {
 }
 
 .pdf-toolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 10px 16px;
-  background: var(--card);
+  background: rgba(var(--card-rgb, 255, 255, 255), 0.92);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   border-bottom: 1px solid var(--border);
-  flex: 0 0 auto;
+  transition: opacity 0.25s ease;
 }
 
 .pdf-title {
@@ -513,6 +522,13 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
+  padding: 52px 0 58px;
+}
+
+.pdf-overlay.pdf-ui-hidden .pdf-toolbar,
+.pdf-overlay.pdf-ui-hidden .pdf-navbar {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .pdf-loading,
@@ -576,14 +592,66 @@ body {
 }
 
 .pdf-navbar {
-  flex: 0 0 auto;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: var(--card);
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(var(--card-rgb), 0.92);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   border-top: 1px solid var(--border);
+  transition: opacity 0.25s ease;
+}
+
+.pdf-goto {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.pdf-page-input {
+  width: 46px;
+  height: 34px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  outline: none;
+}
+
+.pdf-page-input:focus {
+  border-color: var(--primary);
+}
+
+.pdf-page-total {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pdf-scrubber {
+  flex: 1;
+  min-width: 60px;
+  height: 30px;
+  margin: 0 2px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  touch-action: pan-y;
+}
+
+.pdf-controls .pdf-tool {
+  width: 34px;
+  height: 34px;
 }
 
 .pdf-pagenum {
@@ -1061,13 +1129,8 @@ body {
     flex-wrap: wrap;
   }
 
-  .pdf-title {
-    order: 3;
-    flex-basis: 100%;
-  }
-
   .pdf-body {
-    padding: 0;
+    padding: 46px 0 54px;
   }
 
   .pdf-tool {
@@ -1083,5 +1146,9 @@ body {
   #pdfPages {
     gap: 12px;
     padding: 10px 6px;
+  }
+
+  .pdf-zoom-tool {
+    display: none;
   }
 }
