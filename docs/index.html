@@ -36,11 +36,14 @@
 
   <main id="app" class="app" aria-live="polite"></main>
 
-  <!-- PDF preview (native viewer) -->
+  <!-- PDF preview (PDF.js canvas renderer — works on mobile & WebView) -->
   <div class="pdf-overlay" id="pdfOverlay" hidden>
     <div class="pdf-toolbar">
       <span class="pdf-title" id="pdfTitle">PDF</span>
       <div class="pdf-controls">
+        <button class="pdf-tool" id="pdfOpen" title="Ouvrir dans un navigateur" aria-label="Ouvrir dans un navigateur">
+          <i class="fas fa-external-link-alt"></i>
+        </button>
         <button class="pdf-tool" id="pdfClose" title="Fermer" aria-label="Fermer">
           <i class="fas fa-times"></i>
         </button>
@@ -49,9 +52,22 @@
     <div class="pdf-body">
       <div class="pdf-loading" id="pdfLoading"><i class="fas fa-spinner fa-spin"></i> Chargement du document...</div>
       <p class="pdf-error" id="pdfError" hidden>Impossible d'afficher ce document.</p>
-      <div class="pdf-frame-wrap">
-        <embed class="pdf-frame" id="pdfFrame" type="application/pdf">
-      </div>
+      <div class="pdf-frame-wrap" id="pdfFrameWrap"></div>
+    </div>
+    <div class="pdf-navbar" id="pdfNavbar">
+      <button class="pdf-tool" id="pdfZoomOut" title="Réduire" aria-label="Réduire">
+        <i class="fas fa-minus"></i>
+      </button>
+      <button class="pdf-tool pdf-arrow" id="pdfPrev" title="Page précédente" aria-label="Page précédente">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <span class="pdf-pagenum" id="pdfPageInfo">1 / 1</span>
+      <button class="pdf-tool pdf-arrow" id="pdfNext" title="Page suivante" aria-label="Page suivante">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+      <button class="pdf-tool" id="pdfZoomIn" title="Agrandir" aria-label="Agrandir">
+        <i class="fas fa-plus"></i>
+      </button>
     </div>
   </div>
 
@@ -59,7 +75,7 @@
     <div class="container footer-inner">
       <div class="footer-brand">2 BAC Archive</div>
       <div class="footer-school">
-        <i class="fas fa-school" aria-hidden="true"></i> Lycée de Rabat
+        <i class="fas fa-school" aria-hidden="true"></i> Lydex de Rabat
       </div>
       <div class="footer-credit">
         Developed by <strong class="developer">Ahmed BOURAMDANE</strong>

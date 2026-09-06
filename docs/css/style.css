@@ -413,6 +413,7 @@ body {
   inset: 0;
   z-index: 300;
   background: var(--bg);
+  color: var(--text);
   display: flex;
   flex-direction: column;
 }
@@ -466,6 +467,13 @@ body {
   color: var(--primary);
 }
 
+.pdf-tool[disabled],
+.pdf-tool.disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
 .pdf-tool#pdfClose:hover:not(:disabled) {
   border-color: #dc2626;
   color: #dc2626;
@@ -473,24 +481,11 @@ body {
 
 .pdf-body {
   flex: 1;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 0;
   position: relative;
-}
-
-.pdf-frame-wrap {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-}
-
-.pdf-frame {
-  flex: 1;
-  width: 100%;
-  height: 100%;
-  border: none;
 }
 
 .pdf-loading,
@@ -501,10 +496,58 @@ body {
   transform: translate(-50%, -50%);
   color: var(--muted);
   text-align: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .pdf-error {
   color: #dc2626;
+}
+
+.pdf-frame-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 8px;
+  box-sizing: border-box;
+  touch-action: pan-x pan-y;
+}
+
+.pdf-frame-wrap canvas {
+  display: block;
+  flex: none;
+  background: #fff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+  border-radius: 2px;
+}
+
+.pdf-navbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+}
+
+.pdf-pagenum {
+  min-width: 72px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.pdf-tool.pdf-arrow {
+  width: 34px;
+  height: 34px;
 }
 
 /* ---------- Books grid ---------- */
@@ -952,11 +995,20 @@ body {
   }
 
   .pdf-body {
-    padding: 12px;
+    padding: 0;
   }
 
   .pdf-tool {
     width: 36px;
     height: 36px;
+  }
+
+  .pdf-navbar {
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .pdf-frame-wrap {
+    padding: 8px 4px;
   }
 }
