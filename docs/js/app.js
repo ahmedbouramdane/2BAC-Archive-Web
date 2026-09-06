@@ -684,11 +684,11 @@
     var wrap = pdfEl('pdfFrameWrap');
     var slots = pdfPagesEl().querySelectorAll('.pdf-page[data-page]');
     if (slots.length === 0) return PDF.page;
-    var viewCenter = wrap.scrollLeft + wrap.clientWidth / 2;
+    var viewCenter = wrap.scrollTop + wrap.clientHeight / 2;
     var best = 1;
     var bestDist = Infinity;
     for (var i = 0; i < slots.length; i++) {
-      var c = slots[i].offsetLeft + slots[i].clientWidth / 2;
+      var c = slots[i].offsetTop + slots[i].clientHeight / 2;
       var d = Math.abs(c - viewCenter);
       if (d < bestDist) {
         bestDist = d;
@@ -702,11 +702,11 @@
     var wrap = pdfEl('pdfFrameWrap');
     var slot = pdfPagesEl().querySelector('.pdf-page[data-page="' + num + '"]');
     if (!slot) return;
-    var target = slot.offsetLeft + slot.clientWidth / 2 - wrap.clientWidth / 2;
+    var target = slot.offsetTop + slot.clientHeight / 2 - wrap.clientHeight / 2;
     if (smooth) {
-      wrap.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+      wrap.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
     } else {
-      wrap.scrollLeft = Math.max(0, target);
+      wrap.scrollTop = Math.max(0, target);
     }
   }
 
@@ -780,33 +780,77 @@
     pdfCenterPage(num, true);
   }
 
-  function pdfZoom(factor) {
-    PDF.zoom = Math.max(0.4, Math.min(3, factor));
-    pdfLayoutSlots();
-    pdfRenderWindow();
-    pdfCenterPage(PDF.page, false);
+  var PDF_MIN_ZOOM = 0.4;
+  var PDF_MAX_ZOOM = 3;
+
+  /// Captures the current layout state so a later zoom can keep the point
+  /// the user chose (vx, vy relative to the scroller) stationary on screen.
+  function pdfAnchorAtViewport(vx, vy, baseZoom) {
+    var wrap = pdfEl('pdfFrameWrap');
+    var page = pdfCenterPageNum();
+    var slot = pdfPagesEl().querySelector('.pdf-page[data-page="' + page + '"]');
+    var clampY = Math.max(0, Math.min(wrap.clientHeight, vy || wrap.clientHeight / 2));
+    var clampX = Math.max(0, Math.min(wrap.clientWidth, vx || wrap.clientWidth / 2));
+    return {
+      page: page,
+      anchorContentY: wrap.scrollTop + clampY,
+      anchorViewportY: clampY,
+      anchorViewportX: clampX,
+      baseZoom: baseZoom || PDF.zoom,
+      pageTop: slot ? slot.offsetTop : 0,
+      pageHeight: slot ? slot.clientHeight : 1
+    };
   }
 
-  /// Cheap live resize of the page slots while pinching; the actual sharp
-  /// re-render happens on touchend via pdfZoom().
-  function pdfZoomPreview(factor) {
-    PDF.zoom = Math.max(0.4, Math.min(3, factor));
-    pdfScale();
-    var slots = pdfPagesEl().querySelectorAll('.pdf-page[data-page]');
-    for (var i = 0; i < slots.length; i++) {
-      var s = slots[i];
-      var vp = PDF.sizes[parseInt(s.getAttribute('data-page'), 10) - 1];
-      if (!vp) continue;
-      var w = Math.floor(vp.width * PDF.scale);
-      var h = Math.floor(vp.height * PDF.scale);
-      s.style.width = w + 'px';
-      s.style.height = h + 'px';
-      var c = s.querySelector('canvas');
-      if (c) {
-        c.style.width = w + 'px';
-        c.style.height = h + 'px';
+  function pdfClampZoom(z) {
+    return Math.max(PDF_MIN_ZOOM, Math.min(PDF_MAX_ZOOM, z));
+  }
+
+  /// Final, sharp zoom. Repositions the scroller so the chosen anchor point
+  /// stays under the same viewport position (zoom on the chosen area).
+  function pdfZoomTo(newZoom, anchor) {
+    anchor = anchor || pdfAnchorAtViewport(pdfEl('pdfFrameWrap').clientWidth / 2, null, PDF.zoom);
+    newZoom = pdfClampZoom(newZoom);
+    PDF.zoom = newZoom;
+    var frac = anchor.pageHeight > 0
+      ? (anchor.anchorContentY - anchor.pageTop) / anchor.pageHeight
+      : 0.5;
+    frac = Math.max(0, Math.min(1, frac));
+
+    pdfLayoutSlots();
+    pdfRenderWindow();
+
+    var wrap = pdfEl('pdfFrameWrap');
+    if (PDF.doc && PDF.doc.numPages) {
+      var slot = pdfPagesEl().querySelector('.pdf-page[data-page="' + anchor.page + '"]');
+      if (slot) {
+        var newContentY = slot.offsetTop + frac * slot.clientHeight;
+        var maxTop = Math.max(0, wrap.scrollHeight - wrap.clientHeight);
+        wrap.scrollTop = Math.max(0, Math.min(maxTop, newContentY - anchor.anchorViewportY));
       }
     }
+    pdfUpdateNav();
+  }
+
+  function pdfZoom(factor) {
+    pdfZoomTo(factor, null);
+  }
+
+  /// Live preview: scale the whole strip around the anchor while pinching
+  /// (blurry but responsive). The sharp zoom lands on touchend.
+  function pdfZoomPreview(newZoom, anchor) {
+    newZoom = pdfClampZoom(newZoom);
+    var inner = pdfPagesEl();
+    var k = newZoom / anchor.baseZoom;
+    inner.style.transformOrigin = anchor.anchorViewportX + 'px ' + anchor.anchorContentY + 'px';
+    inner.style.transform = 'scale(' + k + ')';
+    PDF.zoom = newZoom;
+  }
+
+  function pdfClearPreview() {
+    var inner = pdfPagesEl();
+    inner.style.transform = '';
+    inner.style.transformOrigin = '';
   }
 
   function initViewer() {
@@ -826,9 +870,10 @@
       if (overlay.hidden) return;
       if (e.key === 'Escape') {
         closeViewer();
-      } else if (e.key === 'ArrowLeft') {
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
         pdfGoto(PDF.page - 1);
-      } else if (e.key === 'ArrowRight') {
+      } else if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault();
         pdfGoto(PDF.page + 1);
       }
     });
@@ -858,10 +903,14 @@
 
     function onPdfTouchStart(e) {
       if (e.touches.length === 2 && PDF.doc) {
+        var rect = wrap.getBoundingClientRect();
+        var cx = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+        var cy = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
         touchStart = {
           mode: 'pinch',
           dist: pdfTouchDist(e.touches),
-          zoom: PDF.zoom
+          zoom: PDF.zoom,
+          anchor: pdfAnchorAtViewport(cx, cy, PDF.zoom)
         };
       } else if (e.touches.length < 2) {
         if (!touchStart || touchStart.mode !== 'pinch') {
@@ -876,13 +925,14 @@
       e.preventDefault();
       var d = pdfTouchDist(e.touches);
       if (touchStart.dist > 0) {
-        pdfZoomPreview(touchStart.zoom * (d / touchStart.dist));
+        pdfZoomPreview(touchStart.zoom * (d / touchStart.dist), touchStart.anchor);
       }
     }
 
     function onPdfTouchEnd(e) {
       if (touchStart && touchStart.mode === 'pinch') {
-        pdfZoom(PDF.zoom);
+        pdfClearPreview();
+        pdfZoomTo(PDF.zoom, touchStart.anchor);
       }
       touchStart = null;
     }
@@ -891,6 +941,18 @@
     wrap.addEventListener('touchmove', onPdfTouchMove, { passive: false });
     wrap.addEventListener('touchend', onPdfTouchEnd, { passive: true });
     wrap.addEventListener('touchcancel', function () { touchStart = null; }, { passive: true });
+
+    // Mouse wheel: Ctrl/⌘ + wheel zooms around the cursor; a plain wheel
+    // scrolls vertically through the pages natively.
+    wrap.addEventListener('wheel', function (e) {
+      if (!PDF.doc || !(e.ctrlKey || e.metaKey)) return;
+      e.preventDefault();
+      var rect = wrap.getBoundingClientRect();
+      var vx = e.clientX - rect.left;
+      var vy = e.clientY - rect.top;
+      var factor = e.deltaY < 0 ? 1.25 : 1 / 1.25;
+      pdfZoomTo(pdfClampZoom(PDF.zoom * factor), pdfAnchorAtViewport(vx, vy, PDF.zoom));
+    }, { passive: false });
 
     app.addEventListener('click', function (e) {
       var docCard = e.target.closest('.doc-card');

@@ -535,27 +535,28 @@ body {
 .pdf-frame-wrap {
   flex: 1;
   min-height: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   display: block;
   box-sizing: border-box;
   touch-action: pan-x pan-y;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
-  scroll-snap-type: x proximity;
-  white-space: nowrap;
+  scroll-snap-type: y proximity;
+  scroll-padding-top: 16px;
+  scroll-padding-bottom: 16px;
+  white-space: normal;
 }
 
 #pdfPages {
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
   gap: 16px;
   padding: 16px 12px;
-  height: 100%;
   box-sizing: border-box;
-  white-space: normal;
+  width: 100%;
 }
 
 .pdf-page {
