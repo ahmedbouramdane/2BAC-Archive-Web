@@ -86,6 +86,12 @@
           window.location.hash = href.slice(1);
           closeMenu();
         }
+        return;
+      }
+      if (e.target.closest('[data-back]')) {
+        e.preventDefault();
+        closeMenu();
+        goBack();
       }
     });
 
@@ -104,6 +110,39 @@
 
   function closeMenu() {
     document.getElementById('navLinks').classList.remove('open');
+  }
+
+  /* ---------- In-app history (back arrow) ---------- */
+  var navHistory = [];
+
+  function currentHash() {
+    return window.location.hash || '#/';
+  }
+
+  function pushNav(hash) {
+    if (navHistory[navHistory.length - 1] === hash) return;
+    navHistory.push(hash);
+  }
+
+  function goBack() {
+    if (navHistory.length > 1) {
+      navHistory.pop(); // current view
+      var prev = navHistory.pop();
+      window.location.hash = prev.replace(/^#/, '');
+      return;
+    }
+    // Fallback: go to the logical parent of the current route.
+    var hash = currentHash();
+    var route = parseRoute(hash);
+    var fallback = '#/';
+    if (route.view === 'lesson') {
+      fallback = '#/' + route.subject;
+    } else if (route.view === 'books-list') {
+      fallback = '#/books';
+    } else if (route.view === 'math' || route.view === 'physics' || route.view === 'books') {
+      fallback = '#/';
+    }
+    window.location.hash = fallback.replace(/^#/, '');
   }
 
   function onHashChange() {
@@ -171,6 +210,7 @@
       return;
     }
     currentKey = key;
+    pushNav(currentHash());
     setActiveLink(route);
     window.scrollTo(0, 0);
 
@@ -608,6 +648,7 @@
 
   function initViewer() {
     var overlay = pdfEl('pdfOverlay');
+    var wrap = pdfEl('pdfFrameWrap');
 
     pdfEl('pdfClose').addEventListener('click', closeViewer);
     pdfEl('pdfOpen').addEventListener('click', function () {
@@ -628,6 +669,67 @@
         pdfGoto(PDF.page + 1);
       }
     });
+
+    // Touch gestures: swipe left/right to change page, two-finger pinch to zoom.
+    var touchStart = null;
+
+    function pdfTouchDist(touches) {
+      var dx = touches[0].clientX - touches[1].clientX;
+      var dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function onPdfTouchStart(e) {
+      if (e.touches.length === 1) {
+        touchStart = {
+          mode: 'swipe',
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
+          lastX: e.touches[0].clientX,
+          lastY: e.touches[0].clientY
+        };
+      } else if (e.touches.length === 2 && PDF.doc) {
+        touchStart = {
+          mode: 'pinch',
+          dist: pdfTouchDist(e.touches),
+          zoom: PDF.zoom
+        };
+      } else {
+        touchStart = null;
+      }
+    }
+
+    function onPdfTouchMove(e) {
+      if (!touchStart) return;
+      if (touchStart.mode === 'pinch' && e.touches.length === 2) {
+        e.preventDefault();
+        var d = pdfTouchDist(e.touches);
+        if (touchStart.dist > 0) {
+          pdfZoom(touchStart.zoom * (d / touchStart.dist));
+        }
+      } else if (touchStart.mode === 'swipe' && e.touches.length === 1) {
+        touchStart.lastX = e.touches[0].clientX;
+        touchStart.lastY = e.touches[0].clientY;
+      }
+    }
+
+    function onPdfTouchEnd(e) {
+      if (!touchStart) return;
+      if (touchStart.mode === 'swipe') {
+        var dx = touchStart.lastX - touchStart.x;
+        var dy = touchStart.lastY - touchStart.y;
+        if (PDF.zoom <= 1.05 && Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+          if (dx < 0) pdfGoto(PDF.page + 1);
+          else pdfGoto(PDF.page - 1);
+        }
+      }
+      touchStart = null;
+    }
+
+    wrap.addEventListener('touchstart', onPdfTouchStart, { passive: true });
+    wrap.addEventListener('touchmove', onPdfTouchMove, { passive: false });
+    wrap.addEventListener('touchend', onPdfTouchEnd, { passive: true });
+    wrap.addEventListener('touchcancel', function () { touchStart = null; }, { passive: true });
 
     app.addEventListener('click', function (e) {
       var docCard = e.target.closest('.doc-card');

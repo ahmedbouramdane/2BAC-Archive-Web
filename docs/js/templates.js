@@ -42,6 +42,11 @@ window.TEMPLATES = {
 
   math: `<section class="hero hero-inner">
   <div class="container">
+    <div class="back-row">
+      <button class="back-btn" data-back aria-label="Retour">
+        <i class="fas fa-arrow-left"></i> Retour
+      </button>
+    </div>
     <h1>Mathématiques</h1>
     <p>13 leçons. Chaque leçon contient un cours et une série d'exercices.</p>
   </div>
@@ -61,6 +66,11 @@ window.TEMPLATES = {
 
   physics: `<section class="hero hero-inner">
   <div class="container">
+    <div class="back-row">
+      <button class="back-btn" data-back aria-label="Retour">
+        <i class="fas fa-arrow-left"></i> Retour
+      </button>
+    </div>
     <h1>Physique &amp; Chimie</h1>
     <p>32 leçons couvrant les deux semestres. Chaque leçon contient un cours et une série d'exercices.</p>
   </div>
@@ -80,6 +90,11 @@ window.TEMPLATES = {
 
   lesson: `<section class="hero hero-inner">
   <div class="container">
+    <div class="back-row">
+      <button class="back-btn" data-back aria-label="Retour">
+        <i class="fas fa-arrow-left"></i> Retour
+      </button>
+    </div>
     <h1 id="docTitle"></h1>
     <p class="muted" id="docSubtitle"></p>
   </div>
@@ -94,6 +109,11 @@ window.TEMPLATES = {
 
   books: `<section class="hero hero-inner">
   <div class="container">
+    <div class="back-row">
+      <button class="back-btn" data-back aria-label="Retour">
+        <i class="fas fa-arrow-left"></i> Retour
+      </button>
+    </div>
     <h1>Livres</h1>
     <p>Bibliothèque de livres PDF. Choisissez une matière pour consulter les couvertures et ouvrir les livres.</p>
   </div>
@@ -119,6 +139,11 @@ window.TEMPLATES = {
 
   "books-list": `<section class="hero hero-inner">
   <div class="container">
+    <div class="back-row">
+      <button class="back-btn" data-back aria-label="Retour">
+        <i class="fas fa-arrow-left"></i> Retour
+      </button>
+    </div>
     <h1 id="booksTitle"></h1>
     <p class="muted" id="booksSubtitle"></p>
   </div>

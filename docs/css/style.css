@@ -209,6 +209,33 @@ body {
   color: var(--on-primary);
 }
 
+/* ---------- Back button ---------- */
+.back-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 18px;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.back-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
 /* ---------- Sections ---------- */
 .section {
   padding: 40px 0;
