@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2BAC SM Archive - Upload</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --card: #ffffff;
+      --text: #1d2733;
+      --muted: #64748b;
+      --border: #dfe3ea;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --on-primary: #ffffff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+
+    .dash-head {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 24px 0;
+      margin-bottom: 28px;
+    }
+    .dash-head h1 { font-size: 1.4rem; }
+    .dash-head p { color: var(--muted); font-size: 0.95rem; }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+    .panel h2 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel h2 i { color: var(--primary); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    input[type="text"], input[type="file"], select {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      width: 100%;
+    }
+    input:focus, select:focus { border-color: var(--primary); }
+    .span-2 { grid-column: span 2; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+    .btn-primary { background: var(--primary); color: var(--on-primary); }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 6px;
+      z-index: 200;
+      transition: transform 0.25s, opacity 0.25s;
+      opacity: 0;
+      font-size: 0.92rem;
+      max-width: 90%;
+      text-align: center;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    .hint {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 640px) {
+      .span-2 { grid-column: span 1; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="dash-head">
+    <div class="wrap">
+      <h1>2BAC SM Archive</h1>
+      <p>Upload - les fichiers PDF sont placés dans static/files et lus directement par le site.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="hint">
+      <i class="fas fa-info-circle"></i>
+      Le site statique lit les dossiers static/files via les manifest.json générés automatiquement ici.
+    </div>
+
+    <section class="panel">
+      <h2><i class="fas fa-book-open"></i> Uploader un document de leçon</h2>
+      <form id="lessonForm">
+        <div class="grid">
+          <div class="field">
+            <label for="ls_subject">Matière</label>
+            <select id="ls_subject" name="subject">
+              <option value="math">Mathématiques</option>
+              <option value="pc">Physique &amp; Chimie</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="ls_lesson">Leçon</label>
+            <select id="ls_lesson" name="lesson"></select>
+          </div>
+          <div class="field">
+            <label for="ls_type">Type</label>
+            <select id="ls_type" name="type">
+              <option value="c">Cours</option>
+              <option value="s">Série d'exercices</option>
+            </select>
+          </div>
+          <div class="field span-2">
+            <label for="ls_title">Titre</label>
+            <input type="text" id="ls_title" name="title" placeholder="Ex : Limites et continuité - Cours" required>
+          </div>
+          <div class="field span-2">
+            <label for="ls_file">Fichier (PDF)</label>
+            <input type="file" id="ls_file" name="file" accept="application/pdf" required>
+          </div>
+          <div class="span-2">
+            <button class="btn btn-primary" type="submit" id="ls_btn">
+              <i class="fas fa-cloud-upload-alt"></i> Uploader
+            </button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2><i class="fas fa-book"></i> Uploader un livre</h2>
+      <form id="bookForm">
+        <div class="grid">
+          <div class="field">
+            <label for="bk_subject">Matière</label>
+            <select id="bk_subject" name="subject">
+              <option value="math">Mathématiques</option>
+              <option value="pc">Physique &amp; Chimie</option>
+            </select>
+          </div>
+          <div class="field span-2">
+            <label for="bk_title">Titre du livre</label>
+            <input type="text" id="bk_title" name="title" placeholder="Ex : Mathématiques - Tout le programme 2BAC" required>
+          </div>
+          <div class="field span-2">
+            <label for="bk_file">Fichier (PDF)</label>
+            <input type="file" id="bk_file" name="file" accept="application/pdf" required>
+          </div>
+          <div class="span-2">
+            <button class="btn btn-primary" type="submit" id="bk_btn">
+              <i class="fas fa-cloud-upload-alt"></i> Uploader
+            </button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2><i class="fas fa-folder-open"></i> Gérer les fichiers existants</h2>
+      <div class="grid">
+        <div class="field">
+          <label for="mg_subject">Matière</label>
+          <select id="mg_subject">
+            <option value="math">Mathématiques</option>
+            <option value="pc">Physique &amp; Chimie</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="mg_lesson">Leçon</label>
+          <select id="mg_lesson"></select>
+        </div>
+        <div class="field">
+          <label for="mg_type">Type</label>
+          <select id="mg_type">
+            <option value="c">Cours</option>
+            <option value="s">Série d'exercices</option>
+          </select>
+        </div>
+        <div class="span-2">
+          <button class="btn btn-primary" type="button" id="mg_load">
+            <i class="fas fa-sync-alt"></i> Charger les fichiers
+          </button>
+        </div>
+      </div>
+      <div id="mg_list" style="margin-top:18px;"></div>
+    </section>
+
+    <section class="panel">
+      <h2><i class="fas fa-bookmark"></i> Gérer les livres existants</h2>
+      <div class="grid">
+        <div class="field">
+          <label for="bk_mg_subject">Matière</label>
+          <select id="bk_mg_subject">
+            <option value="math">Mathématiques</option>
+            <option value="pc">Physique &amp; Chimie</option>
+          </select>
+        </div>
+        <div class="span-2">
+          <button class="btn btn-primary" type="button" id="bk_mg_load">
+            <i class="fas fa-sync-alt"></i> Charger les livres
+          </button>
+        </div>
+      </div>
+      <div id="bk_mg_list" style="margin-top:18px;"></div>
+    </section>
+  </main>
+
+  <!-- Rename modal -->
+  <div id="renameModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center;">
+    <div style="background:var(--card);border-radius:10px;padding:24px;max-width:440px;width:90%;margin:auto;margin-top:20vh;">
+      <h3 style="margin-bottom:14px;font-size:1.05rem;"><i class="fas fa-edit"></i> Modifier le titre</h3>
+      <input type="text" id="renameInput" placeholder="Nouveau titre" style="padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-size:.95rem;width:100%;margin-bottom:14px;">
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn" id="renameCancel" style="background:var(--bg);border:1px solid var(--border);">Annuler</button>
+        <button class="btn btn-primary" id="renameSave"><i class="fas fa-check"></i> Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <style>
+    .file-table { width:100%; border-collapse:collapse; font-size:.9rem; }
+    .file-table th, .file-table td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    .file-table th { color:var(--muted); font-weight:600; font-size:.8rem; text-transform:uppercase; letter-spacing:.5px; }
+    .file-table tr:hover td { background:#f1f5f9; }
+    .file-actions { display:flex; gap:6px; }
+    .file-actions button { padding:6px 10px; border:1px solid var(--border); border-radius:5px; cursor:pointer; font-size:.82rem; background:#fff; display:inline-flex; align-items:center; gap:4px; }
+    .file-actions .edit-btn { color:var(--primary); }
+    .file-actions .edit-btn:hover { background:#eff6ff; }
+    .file-actions .del-btn { color:#dc2626; }
+    .file-actions .del-btn:hover { background:#fef2f2; }
+    .no-files { color:var(--muted); font-size:.9rem; padding:16px 0; }
+  </style>
+
+  <script>
+    var SUBJECTS = { math: 13, pc: 32 };
+    var toastTimeout;
+
+    /* --- Fill lesson dropdowns --- */
+    function fillLessons() {
+      var sel = document.getElementById('ls_lesson');
+      var count = SUBJECTS[document.getElementById('ls_subject').value];
+      sel.innerHTML = '';
+      for (var i = 1; i <= count; i++) {
+        var opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = ('0' + i).slice(-2);
+        sel.appendChild(opt);
+      }
+    }
+
+    function fillMgLessons() {
+      var sel = document.getElementById('mg_lesson');
+      var count = SUBJECTS[document.getElementById('mg_subject').value];
+      sel.innerHTML = '';
+      for (var i = 1; i <= count; i++) {
+        var opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = ('0' + i).slice(-2);
+        sel.appendChild(opt);
+      }
+    }
+
+    /* --- Upload form binding --- */
+    function bindForm(formId, btnId, inputs, endpoint) {
+      document.getElementById(formId).addEventListener('submit', function (e) {
+        e.preventDefault();
+        var fd = new FormData(this);
+        var btn = document.getElementById(btnId);
+        btn.disabled = true;
+        fetch(endpoint, { method: 'POST', body: fd })
+          .then(function (r) {
+            return r.json().then(function (j) {
+              if (!r.ok || !j.ok) throw new Error(j.detail || 'upload failed');
+              return j;
+            });
+          })
+          .then(function () {
+            showToast('Upload réussi.');
+            inputs.forEach(function (id) {
+              var el = document.getElementById(id);
+              if (el.type === 'file') el.value = '';
+              else el.value = '';
+            });
+            // Auto-refresh file lists
+            loadFiles();
+            loadBooks();
+          })
+          .catch(function (err) { showToast(err.message || "Échec de l'upload."); })
+          .finally(function () { btn.disabled = false; });
+      });
+    }
+
+    /* --- File management --- */
+    function loadFiles() {
+      var subject = document.getElementById('mg_subject').value;
+      var lesson = document.getElementById('mg_lesson').value;
+      var type = document.getElementById('mg_type').value;
+      var container = document.getElementById('mg_list');
+      container.innerHTML = '<p class="no-files"><i class="fas fa-spinner fa-spin"></i> Chargement...</p>';
+
+      fetch('api/files?subject=' + subject + '&lesson=' + lesson + '&type=' + type)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (!data.ok || !data.documents || data.documents.length === 0) {
+            container.innerHTML = '<p class="no-files">Aucun fichier pour cette leçon.</p>';
+            return;
+          }
+          var html = '<table class="file-table"><thead><tr><th>Titre</th><th>Fichier</th><th>Taille</th><th>Actions</th></tr></thead><tbody>';
+          data.documents.forEach(function (doc) {
+            var size = doc.size ? (doc.size < 1024 ? doc.size + ' o' : (doc.size / 1024).toFixed(1) + ' Ko') : '';
+            html += '<tr>' +
+              '<td>' + esc(doc.title) + '</td>' +
+              '<td style="font-size:.82rem;color:var(--muted);">' + esc(doc.filename) + '</td>' +
+              '<td>' + size + '</td>' +
+              '<td class="file-actions">' +
+              '  <button class="edit-btn" onclick="renameFile(\'' + esc(doc.filename) + '\', \'' + esc(doc.title).replace(/'/g, "\\'") + '\')"><i class="fas fa-pen"></i> Modifier</button>' +
+              '  <button class="del-btn" onclick="deleteFile(\'' + esc(doc.filename) + '\')"><i class="fas fa-trash"></i> Supprimer</button>' +
+              '</td></tr>';
+          });
+          html += '</tbody></table>';
+          container.innerHTML = html;
+        })
+        .catch(function () {
+          container.innerHTML = '<p class="no-files">Erreur lors du chargement.</p>';
+        });
+    }
+
+    function deleteFile(filename) {
+      if (!confirm('Supprimer ce fichier ? Cette action est irréversible.')) return;
+      var fd = new FormData();
+      fd.append('subject', document.getElementById('mg_subject').value);
+      fd.append('lesson', document.getElementById('mg_lesson').value);
+      fd.append('type', document.getElementById('mg_type').value);
+      fd.append('filename', filename);
+      fetch('api/delete', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (j.ok) { showToast('Fichier supprimé.'); loadFiles(); }
+          else { showToast(j.detail || 'Erreur'); }
+        })
+        .catch(function () { showToast('Erreur réseau.'); });
+    }
+
+    /* --- Book management --- */
+    function loadBooks() {
+      var subject = document.getElementById('bk_mg_subject').value;
+      var container = document.getElementById('bk_mg_list');
+      container.innerHTML = '<p class="no-files"><i class="fas fa-spinner fa-spin"></i> Chargement...</p>';
+
+      fetch('api/books?subject=' + encodeURIComponent(subject))
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (!data.ok || !data.books || data.books.length === 0) {
+            container.innerHTML = '<p class="no-files">Aucun livre pour cette matière.</p>';
+            return;
+          }
+          var html = '<table class="file-table"><thead><tr><th>Titre</th><th>Fichier</th><th>Taille</th><th>Actions</th></tr></thead><tbody>';
+          data.books.forEach(function (doc) {
+            var size = doc.size ? (doc.size < 1024 ? doc.size + ' o' : (doc.size / 1024).toFixed(1) + ' Ko') : '';
+            html += '<tr>' +
+              '<td>' + esc(doc.title) + '</td>' +
+              '<td style="font-size:.82rem;color:var(--muted);">' + esc(doc.filename) + '</td>' +
+              '<td>' + size + '</td>' +
+              '<td class="file-actions">' +
+              '  <button class="edit-btn" onclick="renameBook(\'' + esc(doc.filename) + '\', \'' + esc(doc.title).replace(/'/g, "\\'") + '\')"><i class="fas fa-pen"></i> Modifier</button>' +
+              '  <button class="del-btn" onclick="deleteBook(\'' + esc(doc.filename) + '\')"><i class="fas fa-trash"></i> Supprimer</button>' +
+              '</td></tr>';
+          });
+          html += '</tbody></table>';
+          container.innerHTML = html;
+        })
+        .catch(function () {
+          container.innerHTML = '<p class="no-files">Erreur lors du chargement.</p>';
+        });
+    }
+
+    function deleteBook(filename) {
+      if (!confirm('Supprimer ce livre ? Cette action est irréversible.')) return;
+      var fd = new FormData();
+      fd.append('subject', document.getElementById('bk_mg_subject').value);
+      fd.append('filename', filename);
+      fetch('api/books/delete', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (j.ok) { showToast('Livre supprimé.'); loadBooks(); }
+          else { showToast(j.detail || 'Erreur'); }
+        })
+        .catch(function () { showToast('Erreur réseau.'); });
+    }
+
+    var renameTarget = '';
+    var renameKind = 'lesson';
+    function renameFile(filename, currentTitle) {
+      renameTarget = filename;
+      renameKind = 'lesson';
+      document.getElementById('renameInput').value = currentTitle;
+      document.getElementById('renameModal').style.display = 'flex';
+    }
+
+    function renameBook(filename, currentTitle) {
+      renameTarget = filename;
+      renameKind = 'book';
+      document.getElementById('renameInput').value = currentTitle;
+      document.getElementById('renameModal').style.display = 'flex';
+    }
+
+    document.getElementById('renameCancel').addEventListener('click', function () {
+      document.getElementById('renameModal').style.display = 'none';
+    });
+
+    document.getElementById('renameSave').addEventListener('click', function () {
+      var newTitle = document.getElementById('renameInput').value.trim();
+      if (!newTitle) { showToast('Le titre ne peut pas être vide.'); return; }
+      var fd = new FormData();
+      var isBook = renameKind === 'book';
+      fd.append('subject', isBook ? document.getElementById('bk_mg_subject').value : document.getElementById('mg_subject').value);
+      if (!isBook) {
+        fd.append('lesson', document.getElementById('mg_lesson').value);
+        fd.append('type', document.getElementById('mg_type').value);
+      }
+      fd.append('filename', renameTarget);
+      fd.append('title', newTitle);
+      fetch(isBook ? 'api/books/rename' : 'api/rename', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (j.ok) {
+            showToast('Titre modifié.');
+            document.getElementById('renameModal').style.display = 'none';
+            if (isBook) loadBooks(); else loadFiles();
+          }
+          else { showToast(j.detail || 'Erreur'); }
+        })
+        .catch(function () { showToast('Erreur réseau.'); });
+    });
+
+    /* --- Toast --- */
+    function showToast(msg) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(function () { t.classList.remove('show'); }, 2200);
+    }
+
+    function esc(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* --- Init --- */
+    document.getElementById('ls_subject').addEventListener('change', fillLessons);
+    document.getElementById('mg_subject').addEventListener('change', fillMgLessons);
+    document.getElementById('mg_load').addEventListener('click', loadFiles);
+    document.getElementById('bk_mg_load').addEventListener('click', loadBooks);
+    document.addEventListener('DOMContentLoaded', function () { fillLessons(); fillMgLessons(); });
+    fillLessons();
+    fillMgLessons();
+
+    bindForm('lessonForm', 'ls_btn', ['ls_title', 'ls_file'], 'api/upload');
+    bindForm('bookForm', 'bk_btn', ['bk_title', 'bk_file'], 'api/upload-book');
+  </script>
+</body>
+</html>
