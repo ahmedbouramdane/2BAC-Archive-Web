@@ -1,0 +1,20 @@
+{
+  "documents": [
+    {
+      "title": "test just",
+      "filename": "20260905215858_aa3702_pi.pdf",
+      "size": 990891,
+      "modified": "2026-09-05T21:58:58.750139",
+      "url": "/static/files/math/01/c/20260905215858_aa3702_pi.pdf",
+      "kind": "lesson"
+    },
+    {
+      "title": "Limite et continuite",
+      "filename": "20260905162142_269c65_fontion_et_continuite2bsm.pdf",
+      "size": 638639,
+      "modified": "2026-09-05T16:21:42.906997",
+      "url": "/static/files/math/01/c/20260905162142_269c65_fontion_et_continuite2bsm.pdf",
+      "kind": "lesson"
+    }
+  ]
+}

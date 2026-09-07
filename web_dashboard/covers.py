@@ -74,31 +74,41 @@ def ensure_covers(files_dir: str) -> int:
     generated = 0
     pdfs = []
 
-    subjects_dir = os.path.join(files_dir, "math"), os.path.join(files_dir, "pc")
-    for subject_dir in subjects_dir:
-        if not os.path.isdir(subject_dir):
-            continue
-        for lesson in sorted(os.listdir(subject_dir)):
-            ldir = os.path.join(subject_dir, lesson)
-            if not os.path.isdir(ldir):
+    # Chaque dossier de premier niveau (sauf "books") est un niveau: 2bac, 1bac, tc...
+    if os.path.isdir(files_dir):
+        for level in sorted(os.listdir(files_dir)):
+            lvl = os.path.join(files_dir, level)
+            if level == "books" or not os.path.isdir(lvl):
                 continue
-            for t in ("c", "s"):
-                tdir = os.path.join(ldir, t)
-                if not os.path.isdir(tdir):
+            for subject in ("math", "pc"):
+                sdir = os.path.join(lvl, subject)
+                if not os.path.isdir(sdir):
                     continue
-                for name in sorted(os.listdir(tdir)):
-                    if name.lower().endswith(".pdf"):
-                        pdfs.append(os.path.join(tdir, name))
+                for lesson in sorted(os.listdir(sdir)):
+                    ldir = os.path.join(sdir, lesson)
+                    if not os.path.isdir(ldir):
+                        continue
+                    for t in ("c", "s"):
+                        tdir = os.path.join(ldir, t)
+                        if not os.path.isdir(tdir):
+                            continue
+                        for name in sorted(os.listdir(tdir)):
+                            if name.lower().endswith(".pdf"):
+                                pdfs.append(os.path.join(tdir, name))
 
     books_dir = os.path.join(files_dir, "books")
     if os.path.isdir(books_dir):
-        for subject in ("math", "pc"):
-            sdir = os.path.join(books_dir, subject)
-            if not os.path.isdir(sdir):
+        for level in sorted(os.listdir(books_dir)):
+            lvl = os.path.join(books_dir, level)
+            if not os.path.isdir(lvl):
                 continue
-            for name in sorted(os.listdir(sdir)):
-                if name.lower().endswith(".pdf"):
-                    pdfs.append(os.path.join(sdir, name))
+            for subject in ("math", "pc", "autres"):
+                sdir = os.path.join(lvl, subject)
+                if not os.path.isdir(sdir):
+                    continue
+                for name in sorted(os.listdir(sdir)):
+                    if name.lower().endswith(".pdf"):
+                        pdfs.append(os.path.join(sdir, name))
 
     for pdf_path in pdfs:
         cover_path = cover_for(pdf_path)

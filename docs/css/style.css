@@ -177,6 +177,50 @@ body {
   flex-wrap: wrap;
 }
 
+/* ---------- Sélecteur de niveau ---------- */
+.level-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.level-selector:empty {
+  display: none;
+}
+.level-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.level-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.level-chip.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+}
+.level-chip-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  padding: 1px 6px;
+  letter-spacing: 0.3px;
+}
+
 /* ---------- Buttons ---------- */
 .btn {
   display: inline-flex;
@@ -551,7 +595,7 @@ body {
 .pdf-frame-wrap {
   flex: 1;
   min-height: 0;
-  overflow-x: hidden;
+  overflow-x: auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   display: block;
@@ -577,6 +621,8 @@ body {
 
 .pdf-page {
   flex: 0 0 auto;
+  margin-left: auto;
+  margin-right: auto;
   scroll-snap-align: center;
   display: flex;
   align-items: flex-start;
@@ -589,6 +635,7 @@ body {
 
 .pdf-page canvas {
   display: block;
+  max-width: none;
 }
 
 .pdf-navbar {

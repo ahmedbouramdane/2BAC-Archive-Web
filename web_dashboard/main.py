@@ -13,13 +13,20 @@ from covers import ensure_covers
 from index_builder import build_index
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # 2BAC_web/
-WEB_DIR = os.path.join(BASE_DIR, "web")
+# Site statique publié sur GitHub Pages => dossier docs/ (déployé par GitHub Pages).
+WEB_DIR = os.path.join(BASE_DIR, "docs")
 FILES_DIR = os.path.join(WEB_DIR, "static", "files")
 
-SUBJECTS = {"math": 13, "pc": 32}
+LEVELS = {
+    "2bac": {"math": 13, "pc": 32},
+    "1bac": {"math": 17, "pc": 29},
+    "tc": {"math": 15, "pc": 23},
+}
+SUBJECT_NAMES = {"math": "Mathématiques", "pc": "Physique & Chimie"}
+BOOK_SUBJECTS = {"math": "Mathématiques", "pc": "Physique & Chimie", "autres": "Autres"}
 TYPES = {"c", "s"}
 
-app = FastAPI(title="2BAC SM Archive - Upload", version="2.0.0")
+app = FastAPI(title="2BAC SM Archive - Upload", version="3.1.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,19 +36,22 @@ app.add_middleware(
 )
 
 
-def lesson_dir(subject: str, lesson: str, type_: str):
-    """Valide la leçon et renvoie le dossier cible + numéro normalisé (gestion os)."""
-    if subject not in SUBJECTS:
+def lesson_dir(level: str, subject: str, lesson: str, type_: str):
+    """Valide le niveau/leçon et renvoie le dossier cible + numéro normalisé (gestion os)."""
+    subjects = LEVELS.get(level)
+    if not subjects:
+        raise HTTPException(status_code=400, detail="Niveau invalide")
+    if subject not in subjects:
         raise HTTPException(status_code=400, detail="Matière invalide")
     if not re.fullmatch(r"\d{1,2}", lesson):
         raise HTTPException(status_code=400, detail="Leçon invalide")
     n = int(lesson)
-    if not (1 <= n <= SUBJECTS[subject]):
+    if not (1 <= n <= subjects[subject]):
         raise HTTPException(status_code=400, detail="Leçon hors limites")
     if type_ not in TYPES:
         raise HTTPException(status_code=400, detail="Type invalide")
     name = f"{n:02d}"
-    return os.path.join(FILES_DIR, subject, name, type_), name
+    return os.path.join(FILES_DIR, level, subject, name, type_), name
 
 
 def manifest_path(directory: str) -> str:
@@ -108,16 +118,17 @@ def generate_covers_on_startup():
 
 @app.post("/api/upload")
 async def upload_lesson(
+    level: str = Form(...),
     subject: str = Form(...),
     lesson: str = Form(...),
     type_: str = Form(..., alias="type"),
     title: str = Form(...),
     file: UploadFile = File(...),
 ):
-    directory, name = lesson_dir(subject, lesson, type_)
+    directory, name = lesson_dir(level, subject, lesson, type_)
     os.makedirs(directory, exist_ok=True)
     filename = save_pdf(file, directory)
-    entry = register(directory, filename, title, f"{subject}/{name}/{type_}/", kind="lesson")
+    entry = register(directory, filename, title, f"{level}/{subject}/{name}/{type_}/", kind="lesson")
     ensure_covers(FILES_DIR)
     build_index(FILES_DIR)
     return {"ok": True, "file": filename, "title": entry["title"], "url": entry["url"]}
@@ -125,38 +136,42 @@ async def upload_lesson(
 
 @app.post("/api/upload-book")
 async def upload_book(
+    level: str = Form(...),
     subject: str = Form(...),
     title: str = Form(...),
     file: UploadFile = File(...),
 ):
-    if subject not in SUBJECTS:
+    if level not in LEVELS:
+        raise HTTPException(status_code=400, detail="Niveau invalide")
+    if subject not in BOOK_SUBJECTS:
         raise HTTPException(status_code=400, detail="Matière invalide")
-    directory = os.path.join(FILES_DIR, "books", subject)
+    directory = os.path.join(FILES_DIR, "books", level, subject)
     os.makedirs(directory, exist_ok=True)
     filename = save_pdf(file, directory)
-    entry = register(directory, filename, title, f"books/{subject}/", kind="book")
+    entry = register(directory, filename, title, f"books/{level}/{subject}/", kind="book")
     ensure_covers(FILES_DIR)
     build_index(FILES_DIR)
     return {"ok": True, "file": filename, "title": entry["title"], "url": entry["url"]}
 
 
 @app.get("/api/files")
-def list_files(subject: str, lesson: str, type: str):
-    """Renvoie la liste des documents pour une leçon/type donnée."""
-    directory, name = lesson_dir(subject, lesson, type)
+def list_files(level: str, subject: str, lesson: str, type: str):
+    """Renvoie la liste des documents pour un niveau/leçon/type donné."""
+    directory, name = lesson_dir(level, subject, lesson, type)
     manifest = read_manifest(directory)
     return {"ok": True, "documents": manifest.get("documents", [])}
 
 
 @app.post("/api/delete")
 async def delete_document(
+    level: str = Form(...),
     subject: str = Form(...),
     lesson: str = Form(...),
     type_: str = Form(..., alias="type"),
     filename: str = Form(...),
 ):
     """Supprime un fichier PDF (et sa couverture) puis met à jour le manifest."""
-    directory, _ = lesson_dir(subject, lesson, type_)
+    directory, _ = lesson_dir(level, subject, lesson, type_)
     # Valider que le fichier existe
     filepath = os.path.join(directory, filename)
     if not os.path.isfile(filepath):
@@ -176,6 +191,7 @@ async def delete_document(
 
 @app.post("/api/rename")
 async def rename_document(
+    level: str = Form(...),
     subject: str = Form(...),
     lesson: str = Form(...),
     type_: str = Form(..., alias="type"),
@@ -183,7 +199,7 @@ async def rename_document(
     title: str = Form(...),
 ):
     """Modifie le titre d'un document dans le manifest."""
-    directory, _ = lesson_dir(subject, lesson, type_)
+    directory, _ = lesson_dir(level, subject, lesson, type_)
     filepath = os.path.join(directory, filename)
     if not os.path.isfile(filepath):
         raise HTTPException(status_code=404, detail="Fichier introuvable")
@@ -202,21 +218,29 @@ async def rename_document(
 
 
 @app.get("/api/books")
-def list_books(subject: str):
-    """Renvoie la liste des livres (manifest des books/{subject})."""
-    if subject not in SUBJECTS:
+def list_books(level: str, subject: str):
+    """Renvoie la liste des livres (manifest des books/{level}/{subject})."""
+    if level not in LEVELS:
+        raise HTTPException(status_code=400, detail="Niveau invalide")
+    if subject not in BOOK_SUBJECTS:
         raise HTTPException(status_code=400, detail="Matière invalide")
-    directory = os.path.join(FILES_DIR, "books", subject)
+    directory = os.path.join(FILES_DIR, "books", level, subject)
     manifest = read_manifest(directory)
     return {"ok": True, "books": manifest.get("documents", [])}
 
 
 @app.post("/api/books/delete")
-async def delete_book(subject: str = Form(...), filename: str = Form(...)):
+async def delete_book(
+    level: str = Form(...),
+    subject: str = Form(...),
+    filename: str = Form(...),
+):
     """Supprime un livre PDF (et sa couverture) puis met à jour le manifest."""
-    if subject not in SUBJECTS:
+    if level not in LEVELS:
+        raise HTTPException(status_code=400, detail="Niveau invalide")
+    if subject not in BOOK_SUBJECTS:
         raise HTTPException(status_code=400, detail="Matière invalide")
-    directory = os.path.join(FILES_DIR, "books", subject)
+    directory = os.path.join(FILES_DIR, "books", level, subject)
     filepath = os.path.join(directory, filename)
     if not os.path.isfile(filepath):
         raise HTTPException(status_code=404, detail="Fichier introuvable")
@@ -231,11 +255,18 @@ async def delete_book(subject: str = Form(...), filename: str = Form(...)):
 
 
 @app.post("/api/books/rename")
-async def rename_book(subject: str = Form(...), filename: str = Form(...), title: str = Form(...)):
+async def rename_book(
+    level: str = Form(...),
+    subject: str = Form(...),
+    filename: str = Form(...),
+    title: str = Form(...),
+):
     """Modifie le titre d'un livre dans le manifest."""
-    if subject not in SUBJECTS:
+    if level not in LEVELS:
+        raise HTTPException(status_code=400, detail="Niveau invalide")
+    if subject not in BOOK_SUBJECTS:
         raise HTTPException(status_code=400, detail="Matière invalide")
-    directory = os.path.join(FILES_DIR, "books", subject)
+    directory = os.path.join(FILES_DIR, "books", level, subject)
     filepath = os.path.join(directory, filename)
     if not os.path.isfile(filepath):
         raise HTTPException(status_code=404, detail="Fichier introuvable")

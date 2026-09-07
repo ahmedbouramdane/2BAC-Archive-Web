@@ -29,6 +29,50 @@
     s: { label: "Série d'exercices", icon: 'fa-pen-to-square' }
   };
 
+  var BOOKS_SUBJECTS = {
+    math: { dir: 'math', name: 'Mathématiques', icon: 'fa-calculator' },
+    physics: { dir: 'pc', name: 'Physique & Chimie', icon: 'fa-flask' },
+    autres: { dir: 'autres', name: 'Autres', icon: 'fa-folder-open' }
+  };
+
+  /* ---------- Niveaux ---------- */
+  var LV_KEY = '2bac-current-level';
+
+  function getLevel() {
+    try {
+      var stored = localStorage.getItem(LV_KEY);
+      if (stored && LEVELS[stored]) return stored;
+    } catch (e) { /* ignore */ }
+    return '2bac';
+  }
+
+  function setLevel(id) {
+    if (LEVELS[id]) {
+      try { localStorage.setItem(LV_KEY, id); } catch (e) { /* ignore */ }
+    }
+  }
+
+  function levelData(id) {
+    return LEVELS[id] || LEVELS['2bac'];
+  }
+
+  function subjectData(level, subject) {
+    var data = levelData(level);
+    return subject === 'physics' ? data.physics : data.math;
+  }
+
+  function listLessons(level, subject) {
+    var s = subjectData(level, subject);
+    if (s.semesters) {
+      return s.semesters.s1.lessons.concat(s.semesters.s2.lessons);
+    }
+    return s.lessons || [];
+  }
+
+  function lessonCount(level, subject) {
+    return listLessons(level, subject).length;
+  }
+
   document.addEventListener('DOMContentLoaded', init);
 
   function init() {
@@ -112,37 +156,24 @@
     document.getElementById('navLinks').classList.remove('open');
   }
 
-  /* ---------- In-app history (back arrow) ---------- */
-  var navHistory = [];
-
+  /* ---------- Back button : parent page statique ---------- */
   function currentHash() {
     return window.location.hash || '#/';
   }
 
-  function pushNav(hash) {
-    if (navHistory[navHistory.length - 1] === hash) return;
-    navHistory.push(hash);
-  }
-
   function goBack() {
-    if (navHistory.length > 1) {
-      navHistory.pop(); // current view
-      var prev = navHistory.pop();
-      window.location.hash = prev.replace(/^#/, '');
-      return;
-    }
-    // Fallback: go to the logical parent of the current route.
-    var hash = currentHash();
-    var route = parseRoute(hash);
+    // Retour déterministe : on remonte toujours vers la page parente de la vue courante.
+    var route = parseRoute(currentHash());
     var fallback = '#/';
     if (route.view === 'lesson') {
-      fallback = '#/' + route.subject;
+      fallback = '#/' + route.level + '/' + route.subject;
     } else if (route.view === 'books-list') {
-      fallback = '#/books';
+      fallback = '#/books/' + route.level;
     } else if (route.view === 'math' || route.view === 'physics' || route.view === 'books') {
-      fallback = '#/';
+      fallback = '#/' + (route.level || getLevel());
     }
-    window.location.hash = fallback.replace(/^#/, '');
+    if (fallback === currentHash()) return;
+    window.location.hash = fallback;
   }
 
   function onHashChange() {
@@ -153,64 +184,90 @@
     var path = hash.replace(/^#\/?/, '').replace(/\/+$/, '');
     var parts = path.split('/').filter(Boolean);
 
-    if (parts.length === 0) return { view: 'home' };
+    if (parts.length === 0) return { view: 'home', level: getLevel() };
 
-    if (parts.length === 1) {
-      if (parts[0] === 'math') return { view: 'math' };
-      if (parts[0] === 'physics') return { view: 'physics' };
-      if (parts[0] === 'books') return { view: 'books' };
-      return { view: 'home' };
+    // Routes avec niveau explicite : #/2bac , #/2bac/math , #/2bac/math/01/c
+    if (LEVELS[parts[0]]) {
+      var level = parts[0];
+      if (parts.length === 1) return { view: 'home', level: level };
+      if (parts.length === 2 && SUBJECTS[parts[1]]) {
+        return { view: parts[1], level: level, subject: parts[1] };
+      }
+      if (parts.length === 4 && SUBJECTS[parts[1]] && TYPES[parts[3]]) {
+        return lessonRoute(level, parts[1], parts[2], parts[3]) || { view: 'home', level: level };
+      }
+      return { view: 'home', level: level };
     }
 
-    if (parts.length === 2 && parts[0] === 'books') {
-      var subj = SUBJECTS[parts[1]];
-      if (subj) {
-        return { view: 'books-list', subject: parts[1], dir: subj.dir };
+    // Routes livres : #/books , #/books/{level} , #/books/{subject} , #/books/{level}/{subject}
+    if (parts[0] === 'books') {
+      if (parts.length === 1) return { view: 'books', level: getLevel() };
+      if (parts.length === 2) {
+        if (BOOKS_SUBJECTS[parts[1]]) {
+          return { view: 'books-list', level: getLevel(), subject: parts[1], dir: BOOKS_SUBJECTS[parts[1]].dir };
+        }
+        if (LEVELS[parts[1]]) return { view: 'books', level: parts[1] };
       }
-      return { view: 'home' };
+      if (parts.length === 3 && LEVELS[parts[1]] && BOOKS_SUBJECTS[parts[2]]) {
+        return { view: 'books-list', level: parts[1], subject: parts[2], dir: BOOKS_SUBJECTS[parts[2]].dir };
+      }
+      return { view: 'books', level: getLevel() };
+    }
+
+    // Routes sans niveau (compat.) -> niveau courant
+    if (parts.length === 1 && SUBJECTS[parts[0]]) {
+      return { view: parts[0], level: getLevel(), subject: parts[0] };
     }
 
     if (parts.length === 3) {
       var subject = parts[0];
       var lesson = parts[1];
       var type = parts[2];
-      var subj = SUBJECTS[subject];
-      if (subj && /^\d{1,2}$/.test(lesson) && TYPES[type]) {
-        var n = parseInt(lesson, 10);
-        if (n >= 1 && n <= subj.count) {
-          return {
-            view: 'lesson',
-            subject: subject,
-            dir: subj.dir,
-            lesson: ('0' + n).slice(-2),
-            lessonNum: n,
-            type: type
-          };
-        }
+      if (SUBJECTS[subject] && /^\d{1,2}$/.test(lesson) && TYPES[type]) {
+        return lessonRoute(getLevel(), subject, lesson, type) || { view: 'home', level: getLevel() };
       }
-      return { view: 'home' };
+      return { view: 'home', level: getLevel() };
     }
 
-    return { view: 'home' };
+    return { view: 'home', level: getLevel() };
+  }
+
+  function lessonRoute(level, subject, lesson, type) {
+    var subj = SUBJECTS[subject];
+    var n = parseInt(lesson, 10);
+    if (!subj || !/^\d{1,2}$/.test(lesson) || !TYPES[type]) return null;
+    if (!(n >= 1 && n <= lessonCount(level, subject))) return null;
+    return {
+      view: 'lesson',
+      level: level,
+      subject: subject,
+      dir: subj.dir,
+      lesson: ('0' + n).slice(-2),
+      lessonNum: n,
+      type: type
+    };
   }
 
   function viewKey(route) {
     if (route.view === 'lesson') {
-      return 'lesson:' + route.subject + ':' + route.lesson + ':' + route.type;
+      return 'lesson:' + route.level + ':' + route.subject + ':' + route.lesson + ':' + route.type;
     }
     if (route.view === 'books-list') {
-      return 'books:' + route.dir;
+      return 'books:' + route.level + ':' + route.dir;
+    }
+    if (route.view === 'books' || route.view === 'home' || route.view === 'math' || route.view === 'physics') {
+      return route.view + ':' + route.level;
     }
     return route.view;
   }
 
   function loadView(route) {
+    if (route.level) setLevel(route.level);
     var key = viewKey(route);
     if (key === currentKey && app.innerHTML !== '') {
       return;
     }
     currentKey = key;
-    pushNav(currentHash());
     setActiveLink(route);
     window.scrollTo(0, 0);
 
@@ -237,14 +294,14 @@
 
   /* ---------- Per-view rendering ---------- */
   function afterRender(route) {
-    if (route.view === 'math') {
-      renderMath();
-    } else if (route.view === 'physics') {
-      renderPhysics();
+    if (route.view === 'math' || route.view === 'physics') {
+      renderSubject(route);
     } else if (route.view === 'home') {
-      renderHistory();
+      renderHome(route);
     } else if (route.view === 'lesson') {
       renderDocuments(route);
+    } else if (route.view === 'books') {
+      renderBooks(route);
     } else if (route.view === 'books-list') {
       renderBooksList(route);
     }
@@ -259,22 +316,15 @@
       .replace(/"/g, '&quot;');
   }
 
-  function physicsLessons() {
-    var sem = LESSONS.physics.semesters;
-    return sem.s1.lessons.concat(sem.s2.lessons);
+  function lessonName(level, subject, num) {
+    return listLessons(level, subject)[num - 1];
   }
 
-  function lessonName(subject, num) {
-    return subject === 'math'
-      ? LESSONS.math.lessons[num - 1]
-      : physicsLessons()[num - 1];
+  function lessonLink(level, subject, num, type) {
+    return '#/' + level + '/' + subject + '/' + ('0' + num).slice(-2) + '/' + type;
   }
 
-  function lessonLink(subject, num, type) {
-    return '#/' + subject + '/' + ('0' + num).slice(-2) + '/' + type;
-  }
-
-  function lessonCard(name, num, subject, meta) {
+  function lessonCard(level, name, num, subject, meta) {
     var numPadded = ('0' + num).slice(-2);
     return '' +
       '<div class="lesson-card">' +
@@ -286,42 +336,83 @@
       '    </div>' +
       '  </div>' +
       '  <div class="lesson-actions">' +
-      '    <a href="' + lessonLink(subject, num, 'c') + '" class="lesson-btn cours" data-link>' +
+      '    <a href="' + lessonLink(level, subject, num, 'c') + '" class="lesson-btn cours" data-link>' +
       '      <i class="fas fa-book-open"></i> Cours' +
       '    </a>' +
-      '    <a href="' + lessonLink(subject, num, 's') + '" class="lesson-btn serie" data-link>' +
+      '    <a href="' + lessonLink(level, subject, num, 's') + '" class="lesson-btn serie" data-link>' +
       '      <i class="fas fa-pen-to-square"></i> Série d\'exercices' +
       '    </a>' +
       '  </div>' +
       '</div>';
   }
 
-  function renderMath() {
-    var container = document.getElementById('lessonContainer');
-    container.innerHTML = LESSONS.math.lessons
-      .map(function (name, i) {
-        return lessonCard(name, i + 1, 'math', 'Leçon ' + (i + 1));
-      })
-      .join('');
+  function buildLevelSelector(containerId, activeLevel, subject, prefix) {
+    var el = document.getElementById(containerId);
+    if (!el) return;
+    var base = prefix || '';
+    el.innerHTML = LEVEL_ORDER.map(function (id) {
+      var target = '#' + base + '/' + id + (subject ? '/' + subject : '');
+      return '<a href="' + target + '" class="level-chip' + (id === activeLevel ? ' active' : '') + '" data-link>' +
+        '<span class="level-chip-badge">' + LEVELS[id].short + '</span>' + LEVELS[id].label +
+        '</a>';
+    }).join(' ');
   }
 
-  function renderPhysics() {
+  function renderSubject(route) {
+    var subj = SUBJECTS[route.subject];
+    var lvl = levelData(route.level);
+    var data = subjectData(route.level, route.subject);
+    var total = lessonCount(route.level, route.subject);
+
+    document.getElementById('subjectTitle').textContent = subj.name;
+    document.getElementById('subjectDesc').textContent =
+      lvl.label + ' — ' + total + ' leçons. Chaque leçon contient un cours et une série d\'exercices.';
+    buildLevelSelector('levelSelector', route.level, route.subject);
+
     var container = document.getElementById('semesterContainer');
     var html = '';
-    var offset = 0;
-    Object.keys(LESSONS.physics.semesters).forEach(function (key) {
-      var sem = LESSONS.physics.semesters[key];
-      html += '<div class="semester-block">';
-      html += '<div class="semester-header"><h3>' + sem.name + '</h3><div class="semester-line"></div></div>';
-      html += '<div class="lesson-grid">';
-      sem.lessons.forEach(function (name, i) {
-        var num = offset + i + 1;
-        html += lessonCard(name, num, 'physics', sem.name + ' - Leçon ' + num);
+    if (data.semesters) {
+      var offset = 0;
+      Object.keys(data.semesters).forEach(function (key) {
+        var sem = data.semesters[key];
+        html += '<div class="semester-block">';
+        html += '<div class="semester-header"><h3>' + sem.name + '</h3><div class="semester-line"></div></div>';
+        html += '<div class="lesson-grid">';
+        sem.lessons.forEach(function (name, i) {
+          var num = offset + i + 1;
+          html += lessonCard(route.level, name, num, route.subject, sem.name + ' - Leçon ' + num);
+        });
+        html += '</div></div>';
+        offset += sem.lessons.length;
       });
-      html += '</div></div>';
-      offset += sem.lessons.length;
-    });
+    } else {
+      html += '<div class="semester-block">';
+      html += '<div class="semester-header"><h3>Programme</h3><div class="semester-line"></div></div>';
+      html += '<div class="lesson-grid">' +
+        data.lessons.map(function (name, i) {
+          return lessonCard(route.level, name, i + 1, route.subject, 'Leçon ' + (i + 1));
+        }).join('') +
+        '</div></div>';
+    }
     container.innerHTML = html;
+  }
+
+  function renderHome(route) {
+    var lvl = getLevel();
+    if (route.level) {
+      setLevel(route.level);
+      lvl = route.level;
+    }
+    document.getElementById('homeTitle').textContent = lvl === '2bac'
+      ? '2BAC SM Archive'
+      : levelData(lvl).label + ' — Archive';
+    document.getElementById('homeDesc').textContent = levelData(lvl).description + '.';
+    buildLevelSelector('levelSelector', lvl, null);
+    document.querySelectorAll('[data-level-href]').forEach(function (a) {
+      var value = a.getAttribute('data-level-href');
+      a.setAttribute('href', value === 'books' ? '#/books/' + lvl : '#/' + lvl + '/' + value);
+    });
+    renderHistory();
   }
 
   /* ---------- Reading uploaded files from generated index-data.js (window.INDEX) ---------- */
@@ -329,41 +420,45 @@
     return window.INDEX && window.INDEX.lessons ? window.INDEX : { lessons: {}, books: {} };
   }
 
-  function getLessons(dir, lesson, type) {
+  function getLessons(level, dir, lesson, type) {
     var idx = getIndex();
-    var byLesson = idx.lessons[dir];
-    if (!byLesson || !byLesson[lesson]) return [];
-    var list = byLesson[lesson][type];
+    var byLevel = idx.lessons[level];
+    if (!byLevel || !byLevel[dir] || !byLevel[dir][lesson]) return [];
+    var list = byLevel[dir][lesson][type];
     return list || [];
   }
 
-  function getBooks(subject) {
-    var idx = getIndex();
-    return (idx.books && idx.books[subject]) || [];
-  }
+  function getBooks(level, subject) {
+      var idx = getIndex();
+      if (!idx.books || !idx.books[level]) return [];
+      return idx.books[level][subject] || [];
+    }
 
   /* ---------- Documents list (lesson view) ---------- */
   function renderDocuments(route) {
     var subj = SUBJECTS[route.subject];
+    var lvl = levelData(route.level);
     var typeLabel = TYPES[route.type].label;
-    var name = lessonName(route.subject, route.lessonNum);
+    var name = lessonName(route.level, route.subject, route.lessonNum);
 
     document.getElementById('docTitle').textContent = name;
     document.getElementById('docSubtitle').textContent =
-      subj.name + ' - Leçon ' + route.lessonNum + ' - ' + typeLabel;
+      lvl.label + ' - ' + subj.name + ' - Leçon ' + route.lessonNum + ' - ' + typeLabel;
+    buildLevelSelector('levelSelector', route.level, route.subject);
 
     pushHistory({
-      key: 'lesson:' + route.subject + ':' + route.lesson + ':' + route.type,
+      key: 'lesson:' + route.level + ':' + route.subject + ':' + route.lesson + ':' + route.type,
       subject: route.subject,
       subjectName: subj.name,
+      levelLabel: lvl.label,
       subjectIcon: subj.icon,
       lessonNum: route.lessonNum,
       lessonName: name,
       typeLabel: typeLabel,
-      href: lessonLink(route.subject, route.lessonNum, route.type)
+      href: lessonLink(route.level, route.subject, route.lessonNum, route.type)
     });
 
-    var docs = getLessons(route.dir, route.lesson, route.type);
+    var docs = getLessons(route.level, route.dir, route.lesson, route.type);
     if (docs.length === 0) {
       document.getElementById('docList').innerHTML = '';
       document.getElementById('docEmpty').hidden = false;
@@ -389,15 +484,28 @@
           .join('');
   }
 
-  /* ---------- Books (cover grid) ---------- */
-  function renderBooksList(route) {
-    var subj = SUBJECTS[route.subject];
+  /* ---------- Books (index + cover grid) ---------- */
+  function renderBooks(route) {
+    var lvl = levelData(route.level);
+    document.getElementById('booksTitle').textContent = 'Livres - ' + lvl.label;
+    document.getElementById('booksSubtitle').textContent =
+      'Bibliothèque de livres PDF (cliquez sur une couverture pour lire).';
+    buildLevelSelector('levelSelector', route.level, null, 'books');
+    document.getElementById('booksMathLink').setAttribute('href', '#/books/' + route.level + '/math');
+    document.getElementById('booksPcLink').setAttribute('href', '#/books/' + route.level + '/physics');
+    document.getElementById('booksAutresLink').setAttribute('href', '#/books/' + route.level + '/autres');
+  }
 
-    document.getElementById('booksTitle').textContent = 'Livres - ' + subj.name;
+  function renderBooksList(route) {
+    var subj = BOOKS_SUBJECTS[route.subject];
+    var lvl = levelData(route.level);
+
+    document.getElementById('booksTitle').textContent = 'Livres - ' + lvl.label + ' - ' + subj.name;
     document.getElementById('booksSubtitle').textContent =
       'Bibliothèque de livres de ' + subj.name + ' (cliquez sur une couverture pour lire).';
+    buildLevelSelector('levelSelector', route.level, route.subject, 'books');
 
-    var docs = getBooks(route.dir);
+    var docs = getBooks(route.level, route.dir);
     if (docs.length === 0) {
       document.getElementById('bookGrid').innerHTML = '';
       document.getElementById('bookEmpty').hidden = false;
@@ -411,7 +519,8 @@
               : '<div class="book-fallback"><i class="fas fa-book"></i></div>';
             return '' +
               '<div class="book-card" tabindex="0" role="button"' +
-              ' data-url="' + esc(fileUrl(doc.url)) + '" data-title="' + esc(doc.title) + '" data-subject="' + route.subject + '">' +
+              ' data-url="' + esc(fileUrl(doc.url)) + '" data-title="' + esc(doc.title) + '"' +
+              ' data-level="' + route.level + '" data-subject="' + route.subject + '">' +
               '  <div class="book-cover-wrap">' + coverHtml + '</div>' +
               '  <div class="book-info">' +
               '    <div class="book-title">' + esc(doc.title) + '</div>' +
@@ -454,7 +563,8 @@
     wrap.hidden = false;
     document.getElementById('historyList').innerHTML = arr.slice(0, 6)
       .map(function (e) {
-        var sub = e.subjectName + (e.lessonNum ? ' - Leçon ' + e.lessonNum : '') + ' - ' + e.typeLabel;
+        var sub = (e.levelLabel ? e.levelLabel + ' - ' : '') + e.subjectName +
+          (e.lessonNum ? ' - Leçon ' + e.lessonNum : '') + ' - ' + e.typeLabel;
         return '' +
           '<a class="history-item" href="' + e.href + '" data-link>' +
           '  <span class="history-icon"><i class="fas ' + e.subjectIcon + '"></i></span>' +
@@ -506,7 +616,8 @@
     sizesDone: null,
     availH: 600,
     renderWindow: 2,
-    renderToken: 0
+    renderToken: 0,
+    hPos: {}
   };
 
   function pdfEl(id) { return document.getElementById(id); }
@@ -548,22 +659,16 @@
     return inner;
   }
 
+  /// Reads a single reference page and assumes pages share the same geometry.
+  /// (Fetching every page on open spikes memory and crashes big books.)
   function pdfEnsureSizes() {
     if (PDF.sizesDone) return PDF.sizesDone;
     var doc = PDF.doc;
-    var jobs = [];
-    for (var i = 1; i <= doc.numPages; i++) {
-      jobs.push(doc.getPage(i).then(function (p) {
-        return p.getViewport({ scale: 1 });
-      }));
-    }
-    PDF.sizesDone = Promise.all(jobs).then(function (vps) {
-      PDF.sizes = vps;
-      var maxH = 0;
-      for (var j = 0; j < vps.length; j++) {
-        if (vps[j].height > maxH) maxH = vps[j].height;
-      }
-      PDF.refHeight = maxH || 1;
+    PDF.sizesDone = doc.getPage(1).then(function (p) {
+      return p.getViewport({ scale: 1 });
+    }).then(function (vp) {
+      for (var i = 0; i < doc.numPages; i++) PDF.sizes.push(vp);
+      PDF.refHeight = vp.height || 1;
     }).catch(function () {
       PDF.sizesDone = null;
     });
@@ -575,13 +680,14 @@
     PDF.scale = PDF.fitScale * PDF.zoom;
   }
 
-  /// Builds a placeholder slot (fixed size) for every page so the horizontal
-  /// scrollbar spans the whole document before any page is rendered.
+  /// Builds a placeholder slot (fixed size) for every page so the scrollbar
+  /// spans the whole document before any page is rendered.
   function pdfLayoutSlots() {
     if (!PDF.doc) return;
     var wrap = pdfEl('pdfFrameWrap');
     var inner = pdfPagesEl();
     inner.innerHTML = '';
+    PDF.renderToken++;
     var pad = 24;
     PDF.availH = Math.max(180, wrap.clientHeight - pad);
 
@@ -596,6 +702,8 @@
       slot.style.height = Math.floor(vp.height * PDF.scale) + 'px';
       inner.appendChild(slot);
     }
+    // Cancel any horizontal panning from the previous geometry.
+    wrap.scrollLeft = 0;
   }
 
   function cancelPdfRender() {
@@ -609,26 +717,56 @@
     }
   }
 
+  /// Maximum canvas size in device pixels — keeps WebViews/GPUs from crashing
+  /// on very large (50 MB +) or zoomed-in pages.
+  var PDF_RENDER_MAX_PX = 4096;
+  /// Renders are chained one-by-one so a big document never rasterizes several
+  /// full pages simultaneously (the #1 cause of OOM crashes on mobile).
+  var pdfRenderChain = Promise.resolve();
+
+  function pdfCanvasRatio(cssW, cssH, dpr) {
+    var ratio = Math.min(2, dpr || 1);
+    if (cssH * ratio > PDF_RENDER_MAX_PX) ratio = Math.max(0.25, PDF_RENDER_MAX_PX / cssH);
+    if (cssW * ratio > PDF_RENDER_MAX_PX) ratio = Math.max(0.25, PDF_RENDER_MAX_PX / cssW);
+    return ratio;
+  }
+
+  /// Queues a page render on the serial chain (memory-safe).
   function renderPageCanvas(i) {
     var slot = pdfPagesEl().querySelector('.pdf-page[data-page="' + i + '"]');
     if (!slot) return;
     if (slot.querySelector('canvas')) return;
     if (slot.getAttribute('data-rendering') === '1') return;
     slot.setAttribute('data-rendering', '1');
-    var vp1 = PDF.sizes[i - 1] || PDF.sizes[0] || { width: 1, height: 1.414 };
     var token = PDF.renderToken;
-    var ratio = Math.min(2, window.devicePixelRatio || 1);
+    pdfRenderChain = pdfRenderChain.then(function () {
+      return pdfRenderJob(i, slot, token);
+    }).catch(function () { /* keep the chain alive */ });
+  }
+
+  /// Rasterizes one page onto the slot's canvas (called by the serial chain).
+  function pdfRenderJob(i, slot, token) {
+    if (token !== PDF.renderToken || pdfEl('pdfOverlay').hidden) {
+      slot.setAttribute('data-rendering', '0');
+      return undefined;
+    }
+    var vp1 = PDF.sizes[i - 1] || PDF.sizes[0] || { width: 1, height: 1.414 };
     var scale = PDF.scale;
     var cssW = Math.floor(vp1.width * scale);
     var cssH = Math.floor(vp1.height * scale);
+    var ratio = pdfCanvasRatio(cssW, cssH, window.devicePixelRatio || 1);
 
     var settle = function () {
       slot.setAttribute('data-rendering', '0');
       if (token === PDF.renderToken) pdfRenderWindow();
     };
 
-    PDF.doc.getPage(i).then(function (page) {
-      if (token !== PDF.renderToken || pdfEl('pdfOverlay').hidden) return;
+    return PDF.doc.getPage(i).then(function (page) {
+      if (token !== PDF.renderToken || pdfEl('pdfOverlay').hidden ||
+          slot.querySelector('canvas')) {
+        slot.setAttribute('data-rendering', '0');
+        return undefined;
+      }
       var canvas = document.createElement('canvas');
       slot.appendChild(canvas);
       var ctx = canvas.getContext('2d');
@@ -656,9 +794,8 @@
           if (c) c.remove();
         }
       });
-    }).catch(function () {
-      pdfEl('pdfLoading').hidden = true;
-    }).then(settle);
+      return task.promise;
+    }).then(settle, settle);
   }
 
   /// Renders the pages around the current one; frees canvases far away.
@@ -680,19 +817,37 @@
     });
   }
 
-  function pdfCenterPageNum() {
+  /// Page nearest the vertical viewport center. Scans a small window around the
+/// last known page — plenty for scroll/scroll-snap, and cheap for big books.
+function pdfCenterPageNum() {
     var wrap = pdfEl('pdfFrameWrap');
     var slots = pdfPagesEl().querySelectorAll('.pdf-page[data-page]');
     if (slots.length === 0) return PDF.page;
     var viewCenter = wrap.scrollTop + wrap.clientHeight / 2;
+
+    var idx = Math.max(0, Math.min(slots.length - 1, PDF.page - 1));
+    var win = 10;
+    var lo = Math.max(0, idx - win);
+    var hi = Math.min(slots.length - 1, idx + win);
+
     var best = 1;
     var bestDist = Infinity;
-    for (var i = 0; i < slots.length; i++) {
+    for (var i = lo; i <= hi; i++) {
       var c = slots[i].offsetTop + slots[i].clientHeight / 2;
       var d = Math.abs(c - viewCenter);
       if (d < bestDist) {
         bestDist = d;
         best = parseInt(slots[i].getAttribute('data-page'), 10);
+      }
+    }
+    if (bestDist !== Infinity) return best;
+
+    for (var j = 0; j < slots.length; j++) {
+      var c2 = slots[j].offsetTop + slots[j].clientHeight / 2;
+      var d2 = Math.abs(c2 - viewCenter);
+      if (d2 < bestDist) {
+        bestDist = d2;
+        best = parseInt(slots[j].getAttribute('data-page'), 10);
       }
     }
     return best;
@@ -714,11 +869,18 @@
     if (!PDF.doc) return;
     var num = pdfCenterPageNum();
     if (num !== PDF.page) {
+      PDF.hPos[PDF.page] = pdfEl('pdfFrameWrap').scrollLeft;
       PDF.page = num;
       pdfUpdateNav();
       pdfRenderWindow();
       pdfScheduleSavePage();
     }
+  }
+
+  function pdfApplyHScroll(num) {
+    var wrap = pdfEl('pdfFrameWrap');
+    var maxL = Math.max(0, wrap.scrollWidth - wrap.clientWidth);
+    wrap.scrollLeft = Math.max(0, Math.min(maxL, PDF.hPos[num] || 0));
   }
 
   function pdfUpdateNav() {
@@ -761,6 +923,7 @@
       PDF.zoom = 1;
       PDF.sizes = [];
       PDF.sizesDone = null;
+      PDF.hPos = {};
 
       window.pdfjsLib.getDocument({ url: pdfUrl }).promise
         .then(function (doc) {
@@ -791,6 +954,7 @@
     pdfUpdateNav();
     pdfRenderWindow();
     pdfCenterPage(num, true);
+    pdfApplyHScroll(num);
   }
 
   var PDF_MIN_ZOOM = 0.4;
@@ -806,12 +970,15 @@
     var clampX = Math.max(0, Math.min(wrap.clientWidth, vx || wrap.clientWidth / 2));
     return {
       page: page,
+      anchorContentX: wrap.scrollLeft + clampX,
       anchorContentY: wrap.scrollTop + clampY,
-      anchorViewportY: clampY,
       anchorViewportX: clampX,
+      anchorViewportY: clampY,
       baseZoom: baseZoom || PDF.zoom,
       pageTop: slot ? slot.offsetTop : 0,
-      pageHeight: slot ? slot.clientHeight : 1
+      pageHeight: slot ? slot.clientHeight : 1,
+      pageLeft: slot ? slot.offsetLeft : 0,
+      pageWidth: slot ? slot.clientWidth : 1
     };
   }
 
@@ -820,15 +987,19 @@
   }
 
   /// Final, sharp zoom. Repositions the scroller so the chosen anchor point
-  /// stays under the same viewport position (zoom on the chosen area).
+  /// stays under the same viewport position, vertically and horizontally.
   function pdfZoomTo(newZoom, anchor) {
     anchor = anchor || pdfAnchorAtViewport(pdfEl('pdfFrameWrap').clientWidth / 2, null, PDF.zoom);
     newZoom = pdfClampZoom(newZoom);
     PDF.zoom = newZoom;
-    var frac = anchor.pageHeight > 0
+    var fracV = anchor.pageHeight > 0
       ? (anchor.anchorContentY - anchor.pageTop) / anchor.pageHeight
       : 0.5;
-    frac = Math.max(0, Math.min(1, frac));
+    var fracH = anchor.pageWidth > 0
+      ? (anchor.anchorContentX - anchor.pageLeft) / anchor.pageWidth
+      : 0.5;
+    fracV = Math.max(0, Math.min(1, fracV));
+    fracH = Math.max(0, Math.min(1, fracH));
 
     pdfLayoutSlots();
     pdfRenderWindow();
@@ -837,12 +1008,16 @@
     if (PDF.doc && PDF.doc.numPages) {
       var slot = pdfPagesEl().querySelector('.pdf-page[data-page="' + anchor.page + '"]');
       if (slot) {
-        var newContentY = slot.offsetTop + frac * slot.clientHeight;
+        var newContentY = slot.offsetTop + fracV * slot.clientHeight;
         var maxTop = Math.max(0, wrap.scrollHeight - wrap.clientHeight);
         wrap.scrollTop = Math.max(0, Math.min(maxTop, newContentY - anchor.anchorViewportY));
+        var newContentX = slot.offsetLeft + fracH * slot.clientWidth;
+        var maxLeft = Math.max(0, wrap.scrollWidth - wrap.clientWidth);
+        wrap.scrollLeft = Math.max(0, Math.min(maxLeft, newContentX - anchor.anchorViewportX));
       }
     }
     pdfUpdateNav();
+    PDF.hPos[anchor.page] = wrap.scrollLeft;
   }
 
   function pdfZoom(factor) {
@@ -855,7 +1030,7 @@
     newZoom = pdfClampZoom(newZoom);
     var inner = pdfPagesEl();
     var k = newZoom / anchor.baseZoom;
-    inner.style.transformOrigin = anchor.anchorViewportX + 'px ' + anchor.anchorContentY + 'px';
+    inner.style.transformOrigin = anchor.anchorContentX + 'px ' + anchor.anchorContentY + 'px';
     inner.style.transform = 'scale(' + k + ')';
     PDF.zoom = newZoom;
   }
@@ -923,6 +1098,7 @@
     pdfLayoutSlots();
     pdfRenderWindow();
     pdfCenterPage(PDF.page, false);
+    pdfApplyHScroll(PDF.page);
     pdfUpdateNav();
   }
 
@@ -1010,6 +1186,7 @@
         pdfUpdateNav();
         pdfRenderWindow();
         pdfCenterPage(v, false);
+        pdfApplyHScroll(v);
         pdfScheduleSavePage();
       }
       pdfShowUi();
@@ -1042,6 +1219,7 @@
         pdfLayoutSlots();
         pdfRenderWindow();
         pdfCenterPage(PDF.page, false);
+        pdfApplyHScroll(PDF.page);
       }, 150);
     });
 
@@ -1155,11 +1333,11 @@
         pushHistory({
           key: 'book:' + card.getAttribute('data-url'),
           subject: card.getAttribute('data-subject'),
-          subjectName: SUBJECTS[card.getAttribute('data-subject')].name,
-          subjectIcon: SUBJECTS[card.getAttribute('data-subject')].icon,
+          subjectName: BOOKS_SUBJECTS[card.getAttribute('data-subject')].name,
+          subjectIcon: BOOKS_SUBJECTS[card.getAttribute('data-subject')].icon,
           lessonName: card.getAttribute('data-title') || '',
           typeLabel: 'Livre',
-          href: '#/books/' + card.getAttribute('data-subject')
+          href: '#/books/' + card.getAttribute('data-level') + '/' + card.getAttribute('data-subject')
         });
       }
     });

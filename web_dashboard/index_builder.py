@@ -75,34 +75,51 @@ def build_index(files_dir):
 
     lessons = {}
     books = {}
-    for subject in ("math", "pc"):
-        sdir = os.path.join(files_dir, subject)
-        lessons[subject] = {}
-        if os.path.isdir(sdir):
-            for lesson in sorted(os.listdir(sdir)):
-                ldir = os.path.join(sdir, lesson)
-                if not os.path.isdir(ldir):
+    # Chaque dossier de premier niveau (sauf "books") est un niveau: 2bac, 1bac, tc...
+    if os.path.isdir(files_dir):
+        for level in sorted(os.listdir(files_dir)):
+            lvl = os.path.join(files_dir, level)
+            if level == "books" or not os.path.isdir(lvl):
+                continue
+            lessons[level] = {}
+            for subject in sorted(os.listdir(lvl)):
+                sdir = os.path.join(lvl, subject)
+                if not os.path.isdir(sdir):
                     continue
-                lessons[subject][lesson] = {}
-                for t in ("c", "s"):
-                    tdir = os.path.join(ldir, t)
-                    docs = []
-                    if os.path.isdir(tdir):
-                        manifest_entries = read_manifest(tdir)
-                        for filename in sorted(os.listdir(tdir)):
-                            if filename.lower().endswith(".pdf"):
-                                docs.append(
-                                    entry_for(tdir, filename, f"{subject}/{lesson}/{t}", manifest_entries)
-                                )
-                    lessons[subject][lesson][t] = docs
+                lessons[level][subject] = {}
+                for lesson in sorted(os.listdir(sdir)):
+                    ldir = os.path.join(sdir, lesson)
+                    if not os.path.isdir(ldir):
+                        continue
+                    lessons[level][subject][lesson] = {}
+                    for t in ("c", "s"):
+                        tdir = os.path.join(ldir, t)
+                        docs = []
+                        if os.path.isdir(tdir):
+                            manifest_entries = read_manifest(tdir)
+                            for filename in sorted(os.listdir(tdir)):
+                                if filename.lower().endswith(".pdf"):
+                                    docs.append(
+                                        entry_for(tdir, filename, f"{level}/{subject}/{lesson}/{t}", manifest_entries)
+                                    )
+                        lessons[level][subject][lesson][t] = docs
 
-        bdir = os.path.join(files_dir, "books", subject)
-        books[subject] = []
-        if os.path.isdir(bdir):
-            manifest_entries = read_manifest(bdir)
-            for filename in sorted(os.listdir(bdir)):
-                if filename.lower().endswith(".pdf"):
-                    books[subject].append(entry_for(bdir, filename, f"books/{subject}", manifest_entries))
+    bdir = os.path.join(files_dir, "books")
+    for level in sorted(os.listdir(bdir)):
+        lvl = os.path.join(bdir, level)
+        if not os.path.isdir(lvl):
+            continue
+        books[level] = {}
+        for subject in ("math", "pc", "autres"):
+            sb = os.path.join(lvl, subject)
+            books[level][subject] = []
+            if os.path.isdir(sb):
+                manifest_entries = read_manifest(sb)
+                for filename in sorted(os.listdir(sb)):
+                    if filename.lower().endswith(".pdf"):
+                        books[level][subject].append(
+                            entry_for(sb, filename, f"books/{level}/{subject}", manifest_entries)
+                        )
 
     index = {"lessons": lessons, "books": books, "generated": datetime.now().isoformat()}
     js = "window.INDEX = " + json.dumps(index, ensure_ascii=False, indent=2) + ";\n"

@@ -1,0 +1,20 @@
+{
+  "documents": [
+    {
+      "title": "Bac Express - PC",
+      "filename": "20260907064120_4df32d_bac_express_tronc_commun_physique_chimie.pdf",
+      "size": 22928949,
+      "modified": "2026-09-07T06:41:20.152306",
+      "url": "/static/files/books/tc/pc/20260907064120_4df32d_bac_express_tronc_commun_physique_chimie.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "PC - collection galilee",
+      "filename": "20260907064043_498385_tc_physique_chimie_biof-collection_galilee_1_.pdf",
+      "size": 52220723,
+      "modified": "2026-09-07T06:40:43.589233",
+      "url": "/static/files/books/tc/pc/20260907064043_498385_tc_physique_chimie_biof-collection_galilee_1_.pdf",
+      "kind": "book"
+    }
+  ]
+}

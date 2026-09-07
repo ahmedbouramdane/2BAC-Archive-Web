@@ -1,0 +1,44 @@
+{
+  "documents": [
+    {
+      "title": "Chrono - Arabe",
+      "filename": "20260907065219_f03c17_chrono_bac_arabe.pdf",
+      "size": 26179784,
+      "modified": "2026-09-07T06:52:19.928171",
+      "url": "/static/files/books/1bac/autres/20260907065219_f03c17_chrono_bac_arabe.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Chrono - Français",
+      "filename": "20260907065150_5eea49_chrono_bac_1er_bac_fran_ais_pdf.pdf",
+      "size": 20509071,
+      "modified": "2026-09-07T06:51:50.302361",
+      "url": "/static/files/books/1bac/autres/20260907065150_5eea49_chrono_bac_1er_bac_fran_ais_pdf.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Chrono - Educ. Islamique",
+      "filename": "20260907065114_44340a_chorono_1bac_islamique.pdf",
+      "size": 15998998,
+      "modified": "2026-09-07T06:51:14.884569",
+      "url": "/static/files/books/1bac/autres/20260907065114_44340a_chorono_1bac_islamique.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Sigma - HG",
+      "filename": "20260907065004_d5426f_sigma_histoire_geographie.pdf",
+      "size": 2345615,
+      "modified": "2026-09-07T06:50:04.518254",
+      "url": "/static/files/books/1bac/autres/20260907065004_d5426f_sigma_histoire_geographie.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Chrono bac - HG",
+      "filename": "20260907064947_655fd5_chrono_bac_1er_bac_histoire_et_geographie_pdf.pdf",
+      "size": 26506443,
+      "modified": "2026-09-07T06:49:47.215673",
+      "url": "/static/files/books/1bac/autres/20260907064947_655fd5_chrono_bac_1er_bac_histoire_et_geographie_pdf.pdf",
+      "kind": "book"
+    }
+  ]
+}

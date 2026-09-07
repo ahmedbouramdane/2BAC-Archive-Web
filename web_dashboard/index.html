@@ -129,7 +129,7 @@
   <header class="dash-head">
     <div class="wrap">
       <h1>2BAC SM Archive</h1>
-      <p>Upload - les fichiers PDF sont placés dans static/files et lus directement par le site.</p>
+      <p>Upload - les fichiers PDF sont placés dans static/files (par niveau) et lus directement par le site.</p>
     </div>
   </header>
 
@@ -143,6 +143,14 @@
       <h2><i class="fas fa-book-open"></i> Uploader un document de leçon</h2>
       <form id="lessonForm">
         <div class="grid">
+          <div class="field">
+            <label for="ls_level">Niveau</label>
+            <select id="ls_level" name="level">
+              <option value="2bac">2 BAC SM</option>
+              <option value="1bac">1 BAC SM</option>
+              <option value="tc">Tronc Commun</option>
+            </select>
+          </div>
           <div class="field">
             <label for="ls_subject">Matière</label>
             <select id="ls_subject" name="subject">
@@ -183,10 +191,19 @@
       <form id="bookForm">
         <div class="grid">
           <div class="field">
+            <label for="bk_level">Niveau</label>
+            <select id="bk_level" name="level">
+              <option value="2bac">2 BAC SM</option>
+              <option value="1bac">1 BAC SM</option>
+              <option value="tc">Tronc Commun</option>
+            </select>
+          </div>
+          <div class="field">
             <label for="bk_subject">Matière</label>
             <select id="bk_subject" name="subject">
               <option value="math">Mathématiques</option>
               <option value="pc">Physique &amp; Chimie</option>
+              <option value="autres">Autres</option>
             </select>
           </div>
           <div class="field span-2">
@@ -209,6 +226,14 @@
     <section class="panel">
       <h2><i class="fas fa-folder-open"></i> Gérer les fichiers existants</h2>
       <div class="grid">
+        <div class="field">
+          <label for="mg_level">Niveau</label>
+          <select id="mg_level">
+            <option value="2bac">2 BAC SM</option>
+            <option value="1bac">1 BAC SM</option>
+            <option value="tc">Tronc Commun</option>
+          </select>
+        </div>
         <div class="field">
           <label for="mg_subject">Matière</label>
           <select id="mg_subject">
@@ -240,10 +265,19 @@
       <h2><i class="fas fa-bookmark"></i> Gérer les livres existants</h2>
       <div class="grid">
         <div class="field">
+          <label for="bk_mg_level">Niveau</label>
+          <select id="bk_mg_level">
+            <option value="2bac">2 BAC SM</option>
+            <option value="1bac">1 BAC SM</option>
+            <option value="tc">Tronc Commun</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="bk_mg_subject">Matière</label>
           <select id="bk_mg_subject">
             <option value="math">Mathématiques</option>
             <option value="pc">Physique &amp; Chimie</option>
+            <option value="autres">Autres</option>
           </select>
         </div>
         <div class="span-2">
@@ -285,13 +319,17 @@
   </style>
 
   <script>
-    var SUBJECTS = { math: 13, pc: 32 };
+    var LEVELS = {
+      '2bac': { label: '2 BAC SM', math: 13, pc: 32 },
+      '1bac': { label: '1 BAC SM', math: 17, pc: 29 },
+      'tc': { label: 'Tronc Commun', math: 15, pc: 23 }
+    };
     var toastTimeout;
 
     /* --- Fill lesson dropdowns --- */
     function fillLessons() {
       var sel = document.getElementById('ls_lesson');
-      var count = SUBJECTS[document.getElementById('ls_subject').value];
+      var count = LEVELS[document.getElementById('ls_level').value][document.getElementById('ls_subject').value];
       sel.innerHTML = '';
       for (var i = 1; i <= count; i++) {
         var opt = document.createElement('option');
@@ -303,7 +341,7 @@
 
     function fillMgLessons() {
       var sel = document.getElementById('mg_lesson');
-      var count = SUBJECTS[document.getElementById('mg_subject').value];
+      var count = LEVELS[document.getElementById('mg_level').value][document.getElementById('mg_subject').value];
       sel.innerHTML = '';
       for (var i = 1; i <= count; i++) {
         var opt = document.createElement('option');
@@ -345,13 +383,14 @@
 
     /* --- File management --- */
     function loadFiles() {
+      var level = document.getElementById('mg_level').value;
       var subject = document.getElementById('mg_subject').value;
       var lesson = document.getElementById('mg_lesson').value;
       var type = document.getElementById('mg_type').value;
       var container = document.getElementById('mg_list');
       container.innerHTML = '<p class="no-files"><i class="fas fa-spinner fa-spin"></i> Chargement...</p>';
 
-      fetch('api/files?subject=' + subject + '&lesson=' + lesson + '&type=' + type)
+      fetch('api/files?level=' + encodeURIComponent(level) + '&subject=' + subject + '&lesson=' + lesson + '&type=' + type)
         .then(function (r) { return r.json(); })
         .then(function (data) {
           if (!data.ok || !data.documents || data.documents.length === 0) {
@@ -381,6 +420,7 @@
     function deleteFile(filename) {
       if (!confirm('Supprimer ce fichier ? Cette action est irréversible.')) return;
       var fd = new FormData();
+      fd.append('level', document.getElementById('mg_level').value);
       fd.append('subject', document.getElementById('mg_subject').value);
       fd.append('lesson', document.getElementById('mg_lesson').value);
       fd.append('type', document.getElementById('mg_type').value);
@@ -396,11 +436,12 @@
 
     /* --- Book management --- */
     function loadBooks() {
+      var level = document.getElementById('bk_mg_level').value;
       var subject = document.getElementById('bk_mg_subject').value;
       var container = document.getElementById('bk_mg_list');
       container.innerHTML = '<p class="no-files"><i class="fas fa-spinner fa-spin"></i> Chargement...</p>';
 
-      fetch('api/books?subject=' + encodeURIComponent(subject))
+      fetch('api/books?level=' + encodeURIComponent(level) + '&subject=' + encodeURIComponent(subject))
         .then(function (r) { return r.json(); })
         .then(function (data) {
           if (!data.ok || !data.books || data.books.length === 0) {
@@ -430,6 +471,7 @@
     function deleteBook(filename) {
       if (!confirm('Supprimer ce livre ? Cette action est irréversible.')) return;
       var fd = new FormData();
+      fd.append('level', document.getElementById('bk_mg_level').value);
       fd.append('subject', document.getElementById('bk_mg_subject').value);
       fd.append('filename', filename);
       fetch('api/books/delete', { method: 'POST', body: fd })
@@ -467,7 +509,10 @@
       var fd = new FormData();
       var isBook = renameKind === 'book';
       fd.append('subject', isBook ? document.getElementById('bk_mg_subject').value : document.getElementById('mg_subject').value);
-      if (!isBook) {
+      if (isBook) {
+        fd.append('level', document.getElementById('bk_mg_level').value);
+      } else {
+        fd.append('level', document.getElementById('mg_level').value);
         fd.append('lesson', document.getElementById('mg_lesson').value);
         fd.append('type', document.getElementById('mg_type').value);
       }
@@ -500,7 +545,9 @@
     }
 
     /* --- Init --- */
+    document.getElementById('ls_level').addEventListener('change', fillLessons);
     document.getElementById('ls_subject').addEventListener('change', fillLessons);
+    document.getElementById('mg_level').addEventListener('change', fillMgLessons);
     document.getElementById('mg_subject').addEventListener('change', fillMgLessons);
     document.getElementById('mg_load').addEventListener('click', loadFiles);
     document.getElementById('bk_mg_load').addEventListener('click', loadBooks);

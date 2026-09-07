@@ -1,0 +1,28 @@
+{
+  "documents": [
+    {
+      "title": "Maxi Math - 1 BAC SM - Tome 1",
+      "filename": "20260907063305_438b9b_maxi_maths_1er_bac_sm_tome_1_pdf.pdf",
+      "size": 20540503,
+      "modified": "2026-09-07T06:33:05.913464",
+      "url": "/static/files/books/1bac/math/20260907063305_438b9b_maxi_maths_1er_bac_sm_tome_1_pdf.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Maxi math - 1 BAC EXP",
+      "filename": "20260907063212_80f967_maxi_math_1bac_sc_ex.pdf",
+      "size": 44783880,
+      "modified": "2026-09-07T06:32:12.506940",
+      "url": "/static/files/books/1bac/math/20260907063212_80f967_maxi_math_1bac_sc_ex.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Maxi Math - Logique/Ens/App",
+      "filename": "20260907062818_7b8eb5_maxi_math_-_ahmed_bouramdane_.pdf",
+      "size": 44083645,
+      "modified": "2026-09-07T06:28:18.838968",
+      "url": "/static/files/books/1bac/math/20260907062818_7b8eb5_maxi_math_-_ahmed_bouramdane_.pdf",
+      "kind": "book"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "documents": [
+    {
+      "title": "AL MOUSSAID PC - 1BAC SM",
+      "filename": "20260907063107_afe69e_al_moussaid_en_physique_chimie_1bac_sm.pdf",
+      "size": 12915064,
+      "modified": "2026-09-07T06:31:07.769545",
+      "url": "/static/files/books/1bac/pc/20260907063107_afe69e_al_moussaid_en_physique_chimie_1bac_sm.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Maxi Physique Chimie - 1 BAC SM",
+      "filename": "20260907063028_ee84f1_maxi_physique_chimie_1er_bac_sm.pdf",
+      "size": 51651657,
+      "modified": "2026-09-07T06:30:29.150548",
+      "url": "/static/files/books/1bac/pc/20260907063028_ee84f1_maxi_physique_chimie_1er_bac_sm.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Etincelle physique chimie - SM",
+      "filename": "20260907062934_a03d2a_etincelle_physique_chimie_1er_bac_sm_pdf.pdf",
+      "size": 28566671,
+      "modified": "2026-09-07T06:29:34.657614",
+      "url": "/static/files/books/1bac/pc/20260907062934_a03d2a_etincelle_physique_chimie_1er_bac_sm_pdf.pdf",
+      "kind": "book"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "documents": [
+    {
+      "title": "Maxi Math - TC - Tome 2",
+      "filename": "20260907064001_427a49_maxi_maths_tcs_tome_2.pdf",
+      "size": 20354722,
+      "modified": "2026-09-07T06:40:01.629855",
+      "url": "/static/files/books/tc/math/20260907064001_427a49_maxi_maths_tcs_tome_2.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Maxi Math - TC - Tome 1",
+      "filename": "20260907063947_cd2c13_maxi_maths_tcs_tome_1_1_.pdf",
+      "size": 73167426,
+      "modified": "2026-09-07T06:39:48.003621",
+      "url": "/static/files/books/tc/math/20260907063947_cd2c13_maxi_maths_tcs_tome_1_1_.pdf",
+      "kind": "book"
+    }
+  ]
+}
