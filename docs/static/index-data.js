@@ -436,6 +436,22 @@ window.INDEX = {
           "modified": "2026-09-06T08:50:15.030514",
           "url": "/static/files/books/2bac/pc/20260906085014_9d3b3f_al_moussaid_-_physique_et_chimie_-_2_me_ann_e_baccalaur_at_-_sciences_math_matiques_-_tome_1.pdf",
           "cover": "/static/files/books/2bac/pc/20260906085014_9d3b3f_al_moussaid_-_physique_et_chimie_-_2_me_ann_e_baccalaur_at_-_sciences_math_matiques_-_tome_1_cover.png"
+        },
+        {
+          "title": "Maxi PC 2BAC SM - Tome 1",
+          "filename": "20260907204450_5110e4_maxi_pc_-_2bac_sm_tome_1.pdf",
+          "size": 40087815,
+          "modified": "2026-09-07T20:44:50.140837",
+          "url": "/static/files/books/2bac/pc/20260907204450_5110e4_maxi_pc_-_2bac_sm_tome_1.pdf",
+          "cover": "/static/files/books/2bac/pc/20260907204450_5110e4_maxi_pc_-_2bac_sm_tome_1_cover.png"
+        },
+        {
+          "title": "Maxi PC 2BAC SM - Tome 2",
+          "filename": "20260907204515_06ac89_maxi_2bac_physique_sm_tome_2_pdf.pdf",
+          "size": 57746722,
+          "modified": "2026-09-07T20:45:15.850142",
+          "url": "/static/files/books/2bac/pc/20260907204515_06ac89_maxi_2bac_physique_sm_tome_2_pdf.pdf",
+          "cover": "/static/files/books/2bac/pc/20260907204515_06ac89_maxi_2bac_physique_sm_tome_2_pdf_cover.png"
         }
       ],
       "autres": [
@@ -489,5 +505,5 @@ window.INDEX = {
       "autres": []
     }
   },
-  "generated": "2026-09-07T13:22:31.867223"
+  "generated": "2026-09-07T20:45:16.104052"
 };
