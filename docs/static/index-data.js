@@ -370,6 +370,38 @@ window.INDEX = {
           "modified": "2026-09-07T06:48:24.149884",
           "url": "/static/files/books/2bac/math/20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex.pdf",
           "cover": "/static/files/books/2bac/math/20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex_cover.png"
+        },
+        {
+          "title": "Maxi Maths 2 Bac SM - Tome 2",
+          "filename": "20260907131857_bfa2fd_maxi_2sm_-_tome_2.pdf",
+          "size": 62845868,
+          "modified": "2026-09-07T13:18:57.546678",
+          "url": "/static/files/books/2bac/math/20260907131857_bfa2fd_maxi_2sm_-_tome_2.pdf",
+          "cover": "/static/files/books/2bac/math/20260907131857_bfa2fd_maxi_2sm_-_tome_2_cover.png"
+        },
+        {
+          "title": "Maxi Math 2 Bac PC/SVT - Tome 1",
+          "filename": "20260907131940_54b782_maxi_math_2bac_pc_svt_tome_1.pdf",
+          "size": 45455334,
+          "modified": "2026-09-07T13:19:40.861259",
+          "url": "/static/files/books/2bac/math/20260907131940_54b782_maxi_math_2bac_pc_svt_tome_1.pdf",
+          "cover": "/static/files/books/2bac/math/20260907131940_54b782_maxi_math_2bac_pc_svt_tome_1_cover.png"
+        },
+        {
+          "title": "Maxi Math 2 Bac PC/SVT - Tome 2",
+          "filename": "20260907132011_44eb7f_maxi_math_2bac_pc_et_svt_tome_2.pdf",
+          "size": 54278274,
+          "modified": "2026-09-07T13:20:11.442769",
+          "url": "/static/files/books/2bac/math/20260907132011_44eb7f_maxi_math_2bac_pc_et_svt_tome_2.pdf",
+          "cover": "/static/files/books/2bac/math/20260907132011_44eb7f_maxi_math_2bac_pc_et_svt_tome_2_cover.png"
+        },
+        {
+          "title": "Ultra Math 2 Bac PC/SVT",
+          "filename": "20260907132231_c0dec1_ultra_math.pdf",
+          "size": 58059770,
+          "modified": "2026-09-07T13:22:31.521792",
+          "url": "/static/files/books/2bac/math/20260907132231_c0dec1_ultra_math.pdf",
+          "cover": "/static/files/books/2bac/math/20260907132231_c0dec1_ultra_math_cover.png"
         }
       ],
       "pc": [
@@ -406,7 +438,16 @@ window.INDEX = {
           "cover": "/static/files/books/2bac/pc/20260906085014_9d3b3f_al_moussaid_-_physique_et_chimie_-_2_me_ann_e_baccalaur_at_-_sciences_math_matiques_-_tome_1_cover.png"
         }
       ],
-      "autres": []
+      "autres": [
+        {
+          "title": "في رحاب الفلسفة الثانية باك",
+          "filename": "20260907125309_0fa20a__.pdf",
+          "size": 94980520,
+          "modified": "2026-09-07T12:53:10.278833",
+          "url": "/static/files/books/2bac/autres/20260907125309_0fa20a__.pdf",
+          "cover": "/static/files/books/2bac/autres/20260907125309_0fa20a___cover.png"
+        }
+      ]
     },
     "tc": {
       "math": [
@@ -448,5 +489,5 @@ window.INDEX = {
       "autres": []
     }
   },
-  "generated": "2026-09-07T06:52:20.169511"
+  "generated": "2026-09-07T13:22:31.867223"
 };

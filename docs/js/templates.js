@@ -1,7 +1,10 @@
 window.TEMPLATES = {
   home: `<section class="hero">
   <div class="container">
-    <div class="level-selector" id="levelSelector"></div>
+    <div class="level-selector">
+      <div class="level-selector-label">Niveau</div>
+      <div id="levelSelector"></div>
+    </div>
     <h1 id="homeTitle">2BAC SM Archive</h1>
     <p id="homeDesc">Bibliothèque de cours, séries d'exercices et livres.</p>
     <div class="hero-buttons">
@@ -51,12 +54,15 @@ window.TEMPLATES = {
 
   math: `<section class="hero hero-inner">
   <div class="container">
+    <div class="level-selector">
+      <div class="level-selector-label">Niveau</div>
+      <div id="levelSelector"></div>
+    </div>
     <div class="back-row">
       <button class="back-btn" data-back aria-label="Retour">
         <i class="fas fa-arrow-left"></i> Retour
       </button>
     </div>
-    <div class="level-selector" id="levelSelector"></div>
     <h1 id="subjectTitle">Mathématiques</h1>
     <p id="subjectDesc"></p>
   </div>
@@ -76,12 +82,15 @@ window.TEMPLATES = {
 
   physics: `<section class="hero hero-inner">
   <div class="container">
+    <div class="level-selector">
+      <div class="level-selector-label">Niveau</div>
+      <div id="levelSelector"></div>
+    </div>
     <div class="back-row">
       <button class="back-btn" data-back aria-label="Retour">
         <i class="fas fa-arrow-left"></i> Retour
       </button>
     </div>
-    <div class="level-selector" id="levelSelector"></div>
     <h1 id="subjectTitle">Physique &amp; Chimie</h1>
     <p id="subjectDesc"></p>
   </div>
@@ -101,12 +110,15 @@ window.TEMPLATES = {
 
   lesson: `<section class="hero hero-inner">
   <div class="container">
+    <div class="level-selector">
+      <div class="level-selector-label">Niveau</div>
+      <div id="levelSelector"></div>
+    </div>
     <div class="back-row">
       <button class="back-btn" data-back aria-label="Retour">
         <i class="fas fa-arrow-left"></i> Retour
       </button>
     </div>
-    <div class="level-selector" id="levelSelector"></div>
     <h1 id="docTitle"></h1>
     <p class="muted" id="docSubtitle"></p>
   </div>
@@ -121,12 +133,15 @@ window.TEMPLATES = {
 
   books: `<section class="hero hero-inner">
   <div class="container">
+    <div class="level-selector">
+      <div class="level-selector-label">Niveau</div>
+      <div id="levelSelector"></div>
+    </div>
     <div class="back-row">
       <button class="back-btn" data-back aria-label="Retour">
         <i class="fas fa-arrow-left"></i> Retour
       </button>
     </div>
-    <div class="level-selector" id="levelSelector"></div>
     <h1 id="booksTitle">Livres</h1>
     <p class="muted" id="booksSubtitle"></p>
   </div>
@@ -157,12 +172,15 @@ window.TEMPLATES = {
 
   "books-list": `<section class="hero hero-inner">
   <div class="container">
+    <div class="level-selector">
+      <div class="level-selector-label">Niveau</div>
+      <div id="levelSelector"></div>
+    </div>
     <div class="back-row">
       <button class="back-btn" data-back aria-label="Retour">
         <i class="fas fa-arrow-left"></i> Retour
       </button>
     </div>
-    <div class="level-selector" id="levelSelector"></div>
     <h1 id="booksTitle"></h1>
     <p class="muted" id="booksSubtitle"></p>
   </div>

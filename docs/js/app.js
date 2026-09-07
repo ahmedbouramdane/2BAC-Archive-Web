@@ -177,6 +177,11 @@
   }
 
   function onHashChange() {
+    // Ferme le visionneur PDF ouvert (ex. navigation via le tiroir Flutter)
+    // avant de changer de vue, pour que le modal ne reste pas au-dessus.
+    if (pdfEl('pdfOverlay') && !pdfEl('pdfOverlay').hidden) {
+      closeViewer();
+    }
     loadView(parseRoute(window.location.hash));
   }
 
@@ -350,12 +355,13 @@
     var el = document.getElementById(containerId);
     if (!el) return;
     var base = prefix || '';
-    el.innerHTML = LEVEL_ORDER.map(function (id) {
+    el.innerHTML = '<div class="level-selector-inner">' +
+      LEVEL_ORDER.map(function (id) {
       var target = '#' + base + '/' + id + (subject ? '/' + subject : '');
       return '<a href="' + target + '" class="level-chip' + (id === activeLevel ? ' active' : '') + '" data-link>' +
         '<span class="level-chip-badge">' + LEVELS[id].short + '</span>' + LEVELS[id].label +
         '</a>';
-    }).join(' ');
+    }).join(' ') + '</div>';
   }
 
   function renderSubject(route) {
@@ -1363,6 +1369,13 @@ function pdfCenterPageNum() {
     pdfSetUi(true);
     pdfUpdateFsIcon();
   }
+
+  // Expose la fermeture du lecteur PDF pour qu'une app externe
+  // (ex. le WebView Flutter) puisse le fermer de façon déterministe.
+  window.closePdfViewer = function () {
+    var overlay = pdfEl('pdfOverlay');
+    if (overlay && !overlay.hidden) closeViewer();
+  };
 
   function showPdfError(msg) {
     pdfEl('pdfLoading').hidden = true;

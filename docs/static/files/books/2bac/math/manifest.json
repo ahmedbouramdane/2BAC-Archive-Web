@@ -1,6 +1,38 @@
 {
   "documents": [
     {
+      "title": "Ultra Math 2 Bac PC/SVT",
+      "filename": "20260907132231_c0dec1_ultra_math.pdf",
+      "size": 58059770,
+      "modified": "2026-09-07T13:22:31.521792",
+      "url": "/static/files/books/2bac/math/20260907132231_c0dec1_ultra_math.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Maxi Math 2 Bac PC/SVT - Tome 2",
+      "filename": "20260907132011_44eb7f_maxi_math_2bac_pc_et_svt_tome_2.pdf",
+      "size": 54278274,
+      "modified": "2026-09-07T13:20:11.442769",
+      "url": "/static/files/books/2bac/math/20260907132011_44eb7f_maxi_math_2bac_pc_et_svt_tome_2.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Maxi Math 2 Bac PC/SVT - Tome 1",
+      "filename": "20260907131940_54b782_maxi_math_2bac_pc_svt_tome_1.pdf",
+      "size": 45455334,
+      "modified": "2026-09-07T13:19:40.861259",
+      "url": "/static/files/books/2bac/math/20260907131940_54b782_maxi_math_2bac_pc_svt_tome_1.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Maxi Maths 2 Bac SM - Tome 2",
+      "filename": "20260907131857_bfa2fd_maxi_2sm_-_tome_2.pdf",
+      "size": 62845868,
+      "modified": "2026-09-07T13:18:57.546678",
+      "url": "/static/files/books/2bac/math/20260907131857_bfa2fd_maxi_2sm_-_tome_2.pdf",
+      "kind": "book"
+    },
+    {
       "title": "Resumé des cours 2bac sm - lydex benguerir",
       "filename": "20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex.pdf",
       "size": 7992732,
