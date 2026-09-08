@@ -266,6 +266,14 @@ window.INDEX = {
           "modified": "2026-09-07T06:33:05.913464",
           "url": "/static/files/books/1bac/math/20260907063305_438b9b_maxi_maths_1er_bac_sm_tome_1_pdf.pdf",
           "cover": "/static/files/books/1bac/math/20260907063305_438b9b_maxi_maths_1er_bac_sm_tome_1_pdf_cover.png"
+        },
+        {
+          "title": "Dima Dima 1bac sm - logique",
+          "filename": "20260908125112_d54ef0_dima_dima_1_bac.pdf",
+          "size": 37048551,
+          "modified": "2026-09-08T12:51:13.095622",
+          "url": "/static/files/books/1bac/math/20260908125112_d54ef0_dima_dima_1_bac.pdf",
+          "cover": "/static/files/books/1bac/math/20260908125112_d54ef0_dima_dima_1_bac_cover.png"
         }
       ],
       "pc": [
@@ -505,5 +513,5 @@ window.INDEX = {
       "autres": []
     }
   },
-  "generated": "2026-09-07T20:45:16.104052"
+  "generated": "2026-09-08T12:51:13.574918"
 };
