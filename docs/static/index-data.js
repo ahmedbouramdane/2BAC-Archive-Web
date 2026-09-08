@@ -410,6 +410,14 @@ window.INDEX = {
           "modified": "2026-09-07T13:22:31.521792",
           "url": "/static/files/books/2bac/math/20260907132231_c0dec1_ultra_math.pdf",
           "cover": "/static/files/books/2bac/math/20260907132231_c0dec1_ultra_math_cover.png"
+        },
+        {
+          "title": "Dima Dima 2bac sm - Limites et continuité",
+          "filename": "20260908202534_76dced__01-limite_et_continuit_-dima_dima-2_bac_sm.pdf",
+          "size": 23052155,
+          "modified": "2026-09-08T20:25:34.063077",
+          "url": "/static/files/books/2bac/math/20260908202534_76dced__01-limite_et_continuit_-dima_dima-2_bac_sm.pdf",
+          "cover": "/static/files/books/2bac/math/20260908202534_76dced__01-limite_et_continuit_-dima_dima-2_bac_sm_cover.png"
         }
       ],
       "pc": [
@@ -513,5 +521,5 @@ window.INDEX = {
       "autres": []
     }
   },
-  "generated": "2026-09-08T12:51:13.574918"
+  "generated": "2026-09-08T20:25:34.497280"
 };
