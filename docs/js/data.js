@@ -8,7 +8,7 @@ var LEVEL_ORDER = ['2bac', '1bac', 'tc'];
 var LEVELS = {
   '2bac': {
     id: '2bac',
-    label: '2 BAC SM',
+    label: '2 BAC',
     short: '2BAC',
     description: '2ème année du baccalauréat — Sciences Mathématiques A et B',
     math: {
@@ -78,7 +78,7 @@ var LEVELS = {
 
   '1bac': {
     id: '1bac',
-    label: '1 BAC SM',
+    label: '1 BAC',
     short: '1BAC',
     description: '1ère année du baccalauréat — Sciences Mathématiques',
     math: {
@@ -159,7 +159,7 @@ var LEVELS = {
 
   'tc': {
     id: 'tc',
-    label: 'Tronc Commun',
+    label: 'TC',
     short: 'TC',
     description: 'Tronc Commun — Sciences',
     math: {

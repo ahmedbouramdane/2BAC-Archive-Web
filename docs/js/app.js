@@ -359,7 +359,7 @@
       LEVEL_ORDER.map(function (id) {
       var target = '#' + base + '/' + id + (subject ? '/' + subject : '');
       return '<a href="' + target + '" class="level-chip' + (id === activeLevel ? ' active' : '') + '" data-link>' +
-        '<span class="level-chip-badge">' + LEVELS[id].short + '</span>' + LEVELS[id].label +
+        LEVELS[id].label +
         '</a>';
     }).join(' ') + '</div>';
   }
