@@ -19,6 +19,18 @@
       : rel;
   }
 
+  // Détection simple de la plateforme : 'mobile' (téléphones/tablettes, y
+  // compris le WebView Flutter) ou 'desktop' (PC Windows/Mac).
+  function getPlatform() {
+    if (typeof getPlatform._cache !== 'undefined') return getPlatform._cache;
+    var ua = navigator.userAgent || '';
+    var mobileUa = /Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Windows Phone|webOS/i.test(ua) ||
+                   (/iPad|Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+    var smallTouch = 'ontouchstart' in window && navigator.maxTouchPoints > 0 && innerWidth <= 1024;
+    getPlatform._cache = (mobileUa || smallTouch) ? 'mobile' : 'desktop';
+    return getPlatform._cache;
+  }
+
   var SUBJECTS = {
     math: { name: 'Mathématiques', dir: 'math', count: 13, icon: 'fa-calculator' },
     physics: { name: 'Physique & Chimie', dir: 'pc', count: 32, icon: 'fa-flask' }
@@ -32,8 +44,12 @@
   var BOOKS_SUBJECTS = {
     math: { dir: 'math', name: 'Mathématiques', icon: 'fa-calculator' },
     physics: { dir: 'pc', name: 'Physique & Chimie', icon: 'fa-flask' },
-    autres: { dir: 'autres', name: 'Autres', icon: 'fa-folder-open' }
+    autres: { dir: 'autres', name: 'Autres', icon: 'fa-folder-open' },
+    islamic: { dir: 'general/islamic', name: 'Islamic', icon: 'fa-mosque', general: true },
+    dev: { dir: 'general/dev', name: 'Personal Development', icon: 'fa-seedling', general: true, langs: ['en', 'ar'] },
+    coding: { dir: 'general/coding', name: 'Coding', icon: 'fa-code', general: true, langs: ['en', 'ar'] }
   };
+  var GENERAL_SECTIONS = ['islamic', 'dev', 'coding'];
 
   /* ---------- Niveaux ---------- */
   var LV_KEY = '2bac-current-level';
@@ -136,6 +152,34 @@
         e.preventDefault();
         closeMenu();
         goBack();
+        return;
+      }
+      var trig = document.getElementById('levelSelectTrigger');
+      if (trig) {
+        var wrap = trig.closest('.level-select');
+        var opt = e.target.closest('.level-select-option');
+        if (opt) {
+          e.preventDefault();
+          closeMenu();
+          var target = '#/' + opt.getAttribute('data-level');
+          if (currentHash() === target) {
+            wrap.classList.remove('open');
+            trig.setAttribute('aria-expanded', 'false');
+          } else {
+            window.location.hash = target;
+          }
+          return;
+        }
+        if (e.target.closest('.level-select-trigger')) {
+          e.preventDefault();
+          var open = wrap.classList.toggle('open');
+          trig.setAttribute('aria-expanded', open ? 'true' : 'false');
+          return;
+        }
+        if (!e.target.closest('.level-select-menu')) {
+          wrap.classList.remove('open');
+          trig.setAttribute('aria-expanded', 'false');
+        }
       }
     });
 
@@ -168,7 +212,11 @@
     if (route.view === 'lesson') {
       fallback = '#/' + route.level + '/' + route.subject;
     } else if (route.view === 'books-list') {
-      fallback = '#/books/' + route.level;
+      fallback = (route.subject && BOOKS_SUBJECTS[route.subject] && BOOKS_SUBJECTS[route.subject].general)
+        ? '#/books/general'
+        : '#/books/' + route.level;
+    } else if (route.view === 'books-general') {
+      fallback = '#/books/' + (route.level || getLevel());
     } else if (route.view === 'math' || route.view === 'physics' || route.view === 'books') {
       fallback = '#/' + (route.level || getLevel());
     }
@@ -205,13 +253,32 @@
     }
 
     // Routes livres : #/books , #/books/{level} , #/books/{subject} , #/books/{level}/{subject}
+    // General Books sont indépendants du niveau : #/books/general[/{section}[/{lang}]]
     if (parts[0] === 'books') {
       if (parts.length === 1) return { view: 'books', level: getLevel() };
       if (parts.length === 2) {
+        if (parts[1] === 'general') return { view: 'books-general' };
         if (BOOKS_SUBJECTS[parts[1]]) {
           return { view: 'books-list', level: getLevel(), subject: parts[1], dir: BOOKS_SUBJECTS[parts[1]].dir };
         }
         if (LEVELS[parts[1]]) return { view: 'books', level: parts[1] };
+      }
+      if (parts.length === 3 && parts[1] === 'general' && BOOKS_SUBJECTS[parts[2]]) {
+        return generalBookRoute(parts[2]);
+      }
+      if (parts.length === 4 && parts[1] === 'general' && BOOKS_SUBJECTS[parts[2]] &&
+          BOOKS_SUBJECTS[parts[2]].langs && BOOKS_SUBJECTS[parts[2]].langs.indexOf(parts[3]) !== -1) {
+        return generalBookRoute(parts[2], parts[3]);
+      }
+      // Compat. : anc. routes avec niveau (#/books/{level}/general...)
+      if (parts.length === 3 && LEVELS[parts[1]] && parts[2] === 'general') return { view: 'books-general' };
+      if (parts.length === 4 && LEVELS[parts[1]] && parts[2] === 'general' && BOOKS_SUBJECTS[parts[3]]) {
+        return generalBookRoute(parts[3]);
+      }
+      if (parts.length === 5 && LEVELS[parts[1]] && parts[2] === 'general' &&
+          BOOKS_SUBJECTS[parts[3]] && BOOKS_SUBJECTS[parts[3]].langs &&
+          BOOKS_SUBJECTS[parts[3]].langs.indexOf(parts[4]) !== -1) {
+        return generalBookRoute(parts[3], parts[4]);
       }
       if (parts.length === 3 && LEVELS[parts[1]] && BOOKS_SUBJECTS[parts[2]]) {
         return { view: 'books-list', level: parts[1], subject: parts[2], dir: BOOKS_SUBJECTS[parts[2]].dir };
@@ -235,6 +302,14 @@
     }
 
     return { view: 'home', level: getLevel() };
+  }
+
+  function generalBookRoute(section, lang) {
+    var subj = BOOKS_SUBJECTS[section];
+    if (!subj || !subj.general) return { view: 'books-general' };
+    var l = lang || (subj.langs ? subj.langs[0] : null);
+    var dir = l ? subj.dir + '/' + l : subj.dir;
+    return { view: 'books-list', level: getLevel(), subject: section, lang: l, dir: dir };
   }
 
   function lessonRoute(level, subject, lesson, type) {
@@ -263,6 +338,7 @@
     if (route.view === 'books' || route.view === 'home' || route.view === 'math' || route.view === 'physics') {
       return route.view + ':' + route.level;
     }
+    if (route.view === 'books-general') return 'books-general';
     return route.view;
   }
 
@@ -288,7 +364,7 @@
   function setActiveLink(route) {
     var active;
     if (route.view === 'lesson') active = route.subject;
-    else if (route.view === 'books' || route.view === 'books-list') active = 'books';
+    else if (route.view === 'books' || route.view === 'books-list' || route.view === 'books-general') active = 'books';
     else active = route.view;
 
     var links = document.querySelectorAll('.nav-links a[data-route]');
@@ -307,6 +383,8 @@
       renderDocuments(route);
     } else if (route.view === 'books') {
       renderBooks(route);
+    } else if (route.view === 'books-general') {
+      renderBooksGeneral(route);
     } else if (route.view === 'books-list') {
       renderBooksList(route);
     }
@@ -351,17 +429,22 @@
       '</div>';
   }
 
-  function buildLevelSelector(containerId, activeLevel, subject, prefix) {
-    var el = document.getElementById(containerId);
-    if (!el) return;
-    var base = prefix || '';
-    el.innerHTML = '<div class="level-selector-inner">' +
-      LEVEL_ORDER.map(function (id) {
-      var target = '#' + base + '/' + id + (subject ? '/' + subject : '');
-      return '<a href="' + target + '" class="level-chip' + (id === activeLevel ? ' active' : '') + '" data-link>' +
-        LEVELS[id].label +
-        '</a>';
-    }).join(' ') + '</div>';
+  function renderLevelDropdown() {
+    var lvl = getLevel();
+    var label = document.getElementById('levelSelectLabel');
+    var menu = document.getElementById('levelSelectMenu');
+    if (!label || !menu) return;
+    label.textContent = LEVELS[lvl].label;
+    menu.innerHTML = LEVEL_ORDER.map(function (id) {
+      return '<button type="button" class="level-select-option' + (id === lvl ? ' active' : '') +
+        '" data-level="' + id + '">' +
+        '  <span class="level-opt-text">' +
+        '    <span class="level-opt-main">' + LEVELS[id].label + '</span>' +
+        '    <span class="level-opt-sub">' + esc(LEVELS[id].description) + '</span>' +
+        '  </span>' +
+        '  <i class="fas fa-check level-opt-check"></i>' +
+        '</button>';
+    }).join('');
   }
 
   function renderSubject(route) {
@@ -373,7 +456,6 @@
     document.getElementById('subjectTitle').textContent = subj.name;
     document.getElementById('subjectDesc').textContent =
       lvl.label + ' — ' + total + ' leçons. Chaque leçon contient un cours et une série d\'exercices.';
-    buildLevelSelector('levelSelector', route.level, route.subject);
 
     var container = document.getElementById('semesterContainer');
     var html = '';
@@ -412,8 +494,7 @@
     document.getElementById('homeTitle').textContent = lvl === '2bac'
       ? '2BAC SM Archive'
       : levelData(lvl).label + ' — Archive';
-    document.getElementById('homeDesc').textContent = levelData(lvl).description + '.';
-    buildLevelSelector('levelSelector', lvl, null);
+    renderLevelDropdown();
     document.querySelectorAll('[data-level-href]').forEach(function (a) {
       var value = a.getAttribute('data-level-href');
       a.setAttribute('href', value === 'books' ? '#/books/' + lvl : '#/' + lvl + '/' + value);
@@ -436,6 +517,11 @@
 
   function getBooks(level, subject) {
       var idx = getIndex();
+      // General Books : liste unique partagée (index-data.js → books_general),
+      // indépendante du niveau. Les documents ne sont stockés qu'une fois sur disque.
+      if (subject.indexOf('general/') === 0) {
+        return (idx.books_general && idx.books_general[subject]) || [];
+      }
       if (!idx.books || !idx.books[level]) return [];
       return idx.books[level][subject] || [];
     }
@@ -450,7 +536,6 @@
     document.getElementById('docTitle').textContent = name;
     document.getElementById('docSubtitle').textContent =
       lvl.label + ' - ' + subj.name + ' - Leçon ' + route.lessonNum + ' - ' + typeLabel;
-    buildLevelSelector('levelSelector', route.level, route.subject);
 
     pushHistory({
       key: 'lesson:' + route.level + ':' + route.subject + ':' + route.lesson + ':' + route.type,
@@ -496,20 +581,45 @@
     document.getElementById('booksTitle').textContent = 'Livres - ' + lvl.label;
     document.getElementById('booksSubtitle').textContent =
       'Bibliothèque de livres PDF (cliquez sur une couverture pour lire).';
-    buildLevelSelector('levelSelector', route.level, null, 'books');
     document.getElementById('booksMathLink').setAttribute('href', '#/books/' + route.level + '/math');
     document.getElementById('booksPcLink').setAttribute('href', '#/books/' + route.level + '/physics');
     document.getElementById('booksAutresLink').setAttribute('href', '#/books/' + route.level + '/autres');
+    document.getElementById('booksGeneralLink').setAttribute('href', '#/books/general');
+  }
+
+  function renderBooksGeneral() {
+    document.getElementById('booksTitle').textContent = 'General Books';
+    document.getElementById('booksSubtitle').textContent =
+      'Livres généraux, communs à tous les niveaux : Islamic, Personal Development et Coding.';
+    var lvlSel = document.getElementById('levelSelector');
+    if (lvlSel) lvlSel.innerHTML = '';
+    document.getElementById('generalIslamicLink').setAttribute('href', '#/books/general/islamic');
+    document.getElementById('generalDevLink').setAttribute('href', '#/books/general/dev/en');
+    document.getElementById('generalCodingLink').setAttribute('href', '#/books/general/coding/en');
   }
 
   function renderBooksList(route) {
     var subj = BOOKS_SUBJECTS[route.subject];
     var lvl = levelData(route.level);
+    var general = !!(subj && subj.general);
+    var lang = route.lang || (subj && subj.langs ? subj.langs[0] : null);
 
     document.getElementById('booksTitle').textContent = 'Livres - ' + lvl.label + ' - ' + subj.name;
     document.getElementById('booksSubtitle').textContent =
       'Bibliothèque de livres de ' + subj.name + ' (cliquez sur une couverture pour lire).';
-    buildLevelSelector('levelSelector', route.level, route.subject, 'books');
+
+    var langTabs = document.getElementById('langTabs');
+    if (langTabs && subj && subj.langs) {
+      langTabs.hidden = false;
+      langTabs.innerHTML = subj.langs.map(function (l) {
+        var href = '#/books/general/' + route.subject + '/' + l;
+        return '<a href="' + href + '" class="lang-tab' + (l === lang ? ' active' : '') + '" data-link>' +
+          l.toUpperCase() + '<span class="lang-tab-name">' +
+          (l === 'en' ? 'English' : 'Arabic') + '</span></a>';
+      }).join('');
+    } else if (langTabs) {
+      langTabs.hidden = true;
+    }
 
     var docs = getBooks(route.level, route.dir);
     if (docs.length === 0) {
@@ -922,9 +1032,33 @@ function pdfCenterPageNum() {
     pdfEl('pdfFrameWrap').innerHTML = '';
     cancelPdfRender();
 
+    var pdfUrl = fileUrl(url);
+    PDF.url = pdfUrl;
+
+    // Sur ordinateur (PC Windows/Mac), on affiche le PDF via le lecteur natif
+    // du navigateur dans une iframe : plus fiable que pdf.js côté desktop.
+    // Le lecteur pdf.js (horizontal, zoom, plein écran) reste inchangé sur
+    // mobile / WebView.
+    if (getPlatform() === 'desktop') {
+      pdfEl('pdfOverlay').classList.add('pdf-native');
+      PDF.page = 1;
+      PDF.zoom = 1;
+      PDF.sizes = [];
+      PDF.sizesDone = null;
+      PDF.hPos = {};
+      var frame = document.createElement('iframe');
+      frame.className = 'pdf-native-frame';
+      frame.title = pdfEl('pdfTitle').textContent || 'Document PDF';
+      frame.src = pdfUrl;
+      frame.onload = function () { loading.hidden = true; };
+      pdfEl('pdfFrameWrap').appendChild(frame);
+      pdfEnterFs();
+      return;
+    }
+
+    pdfEl('pdfOverlay').classList.remove('pdf-native');
+
     loadPdfJs(function () {
-      var pdfUrl = fileUrl(url);
-      PDF.url = pdfUrl;
       PDF.page = 1;
       PDF.zoom = 1;
       PDF.sizes = [];
@@ -1075,6 +1209,23 @@ function pdfCenterPageNum() {
   /* ---------- Full screen ---------- */
   function pdfIsFs() {
     return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+  function pdfEnterFs() {
+    var o = pdfEl('pdfOverlay');
+    var fn = o.requestFullscreen || o.webkitRequestFullscreen || o.msRequestFullscreen;
+    if (!fn) return false;
+    try {
+      var p = fn.call(o);
+      if (p && typeof p.catch === 'function') p.catch(function () {});
+      return true;
+    } catch (e) { return false; }
+  }
+  function pdfExitFs() {
+    if (!pdfIsFs()) return;
+    try {
+      var p = (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      if (p && typeof p.catch === 'function') p.catch(function () {});
+    } catch (e) { /* ignore */ }
   }
   function pdfUpdateFsIcon() {
     var b = pdfEl('pdfFullscreen');
@@ -1335,15 +1486,18 @@ function pdfCenterPageNum() {
       }
       var card = e.target.closest('.book-card');
       if (card) {
+        var subjKey = card.getAttribute('data-subject');
         loadPdf(card.getAttribute('data-url'), card.getAttribute('data-title') || '');
         pushHistory({
           key: 'book:' + card.getAttribute('data-url'),
-          subject: card.getAttribute('data-subject'),
-          subjectName: BOOKS_SUBJECTS[card.getAttribute('data-subject')].name,
-          subjectIcon: BOOKS_SUBJECTS[card.getAttribute('data-subject')].icon,
+          subject: subjKey,
+          subjectName: BOOKS_SUBJECTS[subjKey].name,
+          subjectIcon: BOOKS_SUBJECTS[subjKey].icon,
           lessonName: card.getAttribute('data-title') || '',
           typeLabel: 'Livre',
-          href: '#/books/' + card.getAttribute('data-level') + '/' + card.getAttribute('data-subject')
+          href: BOOKS_SUBJECTS[subjKey].general
+            ? '#/books/general/' + subjKey
+            : '#/books/' + card.getAttribute('data-level') + '/' + subjKey
         });
       }
     });
@@ -1351,7 +1505,9 @@ function pdfCenterPageNum() {
 
   function closeViewer() {
     pdfSaveLastPage();
+    pdfExitFs();
     pdfEl('pdfOverlay').hidden = true;
+    pdfEl('pdfOverlay').classList.remove('pdf-native');
     document.body.style.overflow = '';
     cancelPdfRender();
     PDF.doc = null;

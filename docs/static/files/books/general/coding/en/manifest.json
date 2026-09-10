@@ -1,0 +1,52 @@
+{
+  "documents": [
+    {
+      "title": "Learning Python",
+      "filename": "20260909155902_c5d8c4_learning_python.pdf",
+      "size": 7375518,
+      "modified": "2026-09-09T15:59:02.520349",
+      "url": "/static/files/books/2bac/general/coding/en/20260909155902_c5d8c4_learning_python.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "LaTeX Notes For Professionals",
+      "filename": "20260909155703_0487ec_latexnotesforprofessionals.pdf",
+      "size": 1419555,
+      "modified": "2026-09-09T15:57:03.387824",
+      "url": "/static/files/books/2bac/general/coding/en/20260909155703_0487ec_latexnotesforprofessionals.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Python Notes For Professionals",
+      "filename": "20260909155634_8ad6e6_pythonnotesforprofessionals.pdf",
+      "size": 6361425,
+      "modified": "2026-09-09T15:56:34.067341",
+      "url": "/static/files/books/2bac/general/coding/en/20260909155634_8ad6e6_pythonnotesforprofessionals.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "JavaScript Notes For Professionals",
+      "filename": "20260909155607_a5ac88_javascriptnotesforprofessionals.pdf",
+      "size": 4293732,
+      "modified": "2026-09-09T15:56:07.281997",
+      "url": "/static/files/books/2bac/general/coding/en/20260909155607_a5ac88_javascriptnotesforprofessionals.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Java Notes For Professionals",
+      "filename": "20260909155545_1ff71a_javanotesforprofessionals.pdf",
+      "size": 7386481,
+      "modified": "2026-09-09T15:55:45.141967",
+      "url": "/static/files/books/2bac/general/coding/en/20260909155545_1ff71a_javanotesforprofessionals.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "C++ Notes For Professionals",
+      "filename": "20260909155513_8bde59_cplusplusnotesforprofessionals.pdf",
+      "size": 5111998,
+      "modified": "2026-09-09T15:55:13.298198",
+      "url": "/static/files/books/2bac/general/coding/en/20260909155513_8bde59_cplusplusnotesforprofessionals.pdf",
+      "kind": "book"
+    }
+  ]
+}

@@ -1,12 +1,14 @@
 window.TEMPLATES = {
   home: `<section class="hero">
   <div class="container">
-    <div class="level-selector">
-      <div class="level-selector-label">Niveau</div>
-      <div id="levelSelector"></div>
+    <div class="level-select">
+      <button type="button" class="level-select-trigger" id="levelSelectTrigger" aria-haspopup="listbox" aria-expanded="false">
+        <span id="levelSelectLabel"></span>
+        <i class="fas fa-chevron-down level-select-caret"></i>
+      </button>
+      <div class="level-select-menu" id="levelSelectMenu" role="listbox"></div>
     </div>
     <h1 id="homeTitle">2BAC SM Archive</h1>
-    <p id="homeDesc">Bibliothèque de cours, séries d'exercices et livres.</p>
     <div class="hero-buttons">
       <a href="#/math" class="btn btn-primary" data-link data-level-href="math">
         <i class="fas fa-calculator"></i> Mathématiques
@@ -54,14 +56,13 @@ window.TEMPLATES = {
 
   math: `<section class="hero hero-inner">
   <div class="container">
-    <div class="level-selector">
-      <div class="level-selector-label">Niveau</div>
-      <div id="levelSelector"></div>
-    </div>
     <div class="back-row">
       <button class="back-btn" data-back aria-label="Retour">
         <i class="fas fa-arrow-left"></i> Retour
       </button>
+      <a href="#/" class="home-btn" data-link>
+        <i class="fas fa-home"></i> Accueil
+      </a>
     </div>
     <h1 id="subjectTitle">Mathématiques</h1>
     <p id="subjectDesc"></p>
@@ -82,14 +83,13 @@ window.TEMPLATES = {
 
   physics: `<section class="hero hero-inner">
   <div class="container">
-    <div class="level-selector">
-      <div class="level-selector-label">Niveau</div>
-      <div id="levelSelector"></div>
-    </div>
     <div class="back-row">
       <button class="back-btn" data-back aria-label="Retour">
         <i class="fas fa-arrow-left"></i> Retour
       </button>
+      <a href="#/" class="home-btn" data-link>
+        <i class="fas fa-home"></i> Accueil
+      </a>
     </div>
     <h1 id="subjectTitle">Physique &amp; Chimie</h1>
     <p id="subjectDesc"></p>
@@ -110,14 +110,13 @@ window.TEMPLATES = {
 
   lesson: `<section class="hero hero-inner">
   <div class="container">
-    <div class="level-selector">
-      <div class="level-selector-label">Niveau</div>
-      <div id="levelSelector"></div>
-    </div>
     <div class="back-row">
       <button class="back-btn" data-back aria-label="Retour">
         <i class="fas fa-arrow-left"></i> Retour
       </button>
+      <a href="#/" class="home-btn" data-link>
+        <i class="fas fa-home"></i> Accueil
+      </a>
     </div>
     <h1 id="docTitle"></h1>
     <p class="muted" id="docSubtitle"></p>
@@ -133,14 +132,13 @@ window.TEMPLATES = {
 
   books: `<section class="hero hero-inner">
   <div class="container">
-    <div class="level-selector">
-      <div class="level-selector-label">Niveau</div>
-      <div id="levelSelector"></div>
-    </div>
     <div class="back-row">
       <button class="back-btn" data-back aria-label="Retour">
         <i class="fas fa-arrow-left"></i> Retour
       </button>
+      <a href="#/" class="home-btn" data-link>
+        <i class="fas fa-home"></i> Accueil
+      </a>
     </div>
     <h1 id="booksTitle">Livres</h1>
     <p class="muted" id="booksSubtitle"></p>
@@ -166,20 +164,62 @@ window.TEMPLATES = {
         <h3>Autres</h3>
         <p>Autres livres : guides, annales, autres matières et documents divers.</p>
       </a>
+      <a id="booksGeneralLink" href="#/books/general" class="subject-card general" data-link>
+        <div class="subject-icon"><i class="fas fa-book"></i></div>
+        <h3>General Books</h3>
+        <p>Livres généraux : Islamic, Personal Development et Coding.</p>
+      </a>
+    </div>
+  </div>
+</section>`,
+
+  "books-general": `<section class="hero hero-inner">
+  <div class="container">
+    <div class="back-row">
+      <button class="back-btn" data-back aria-label="Retour">
+        <i class="fas fa-arrow-left"></i> Retour
+      </button>
+      <a href="#/" class="home-btn" data-link>
+        <i class="fas fa-home"></i> Accueil
+      </a>
+    </div>
+    <h1 id="booksTitle">General Books</h1>
+    <p class="muted" id="booksSubtitle"></p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Sections</h2>
+    <div class="cards-grid">
+      <a id="generalIslamicLink" href="#/books/general/islamic" class="subject-card" data-link>
+        <div class="subject-icon"><i class="fas fa-mosque"></i></div>
+        <h3>Islamic</h3>
+        <p>Livres et ressources islamiques.</p>
+      </a>
+      <a id="generalDevLink" href="#/books/general/dev/en" class="subject-card" data-link>
+        <div class="subject-icon"><i class="fas fa-seedling"></i></div>
+        <h3>Personal Development</h3>
+        <p>Développement personnel (EN / AR).</p>
+      </a>
+      <a id="generalCodingLink" href="#/books/general/coding/en" class="subject-card coding" data-link>
+        <div class="subject-icon"><i class="fas fa-code"></i></div>
+        <h3>Coding</h3>
+        <p>Programmation et développement (EN / AR).</p>
+      </a>
     </div>
   </div>
 </section>`,
 
   "books-list": `<section class="hero hero-inner">
   <div class="container">
-    <div class="level-selector">
-      <div class="level-selector-label">Niveau</div>
-      <div id="levelSelector"></div>
-    </div>
     <div class="back-row">
       <button class="back-btn" data-back aria-label="Retour">
         <i class="fas fa-arrow-left"></i> Retour
       </button>
+      <a href="#/" class="home-btn" data-link>
+        <i class="fas fa-home"></i> Accueil
+      </a>
     </div>
     <h1 id="booksTitle"></h1>
     <p class="muted" id="booksSubtitle"></p>
@@ -188,6 +228,7 @@ window.TEMPLATES = {
 
 <section class="section">
   <div class="container">
+    <div class="lang-tabs" id="langTabs" hidden></div>
     <div class="book-grid" id="bookGrid"></div>
     <p class="empty" id="bookEmpty" hidden>Aucun livre pour le moment.</p>
   </div>

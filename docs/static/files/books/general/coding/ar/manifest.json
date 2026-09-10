@@ -1,0 +1,44 @@
+{
+  "documents": [
+    {
+      "title": "مدخل إلى الذكاء الاصطناعي وتعلم الآلة",
+      "filename": "20260909155407_c85939__.pdf",
+      "size": 6760587,
+      "modified": "2026-09-09T15:54:07.209285",
+      "url": "/static/files/books/2bac/general/coding/ar/20260909155407_c85939__.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "البرمجة بلغة رست",
+      "filename": "20260909155348_6eaff4__.pdf",
+      "size": 7229587,
+      "modified": "2026-09-09T15:53:48.354756",
+      "url": "/static/files/books/2bac/general/coding/ar/20260909155348_6eaff4__.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "علوم الحاسوب من الألف إلى الياء",
+      "filename": "20260909155321_f46542__.pdf",
+      "size": 3779555,
+      "modified": "2026-09-09T15:53:21.407722",
+      "url": "/static/files/books/2bac/general/coding/ar/20260909155321_f46542__.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "البرمجة بلغة سي",
+      "filename": "20260909155301_cdf712__.pdf",
+      "size": 3762830,
+      "modified": "2026-09-09T15:53:01.062079",
+      "url": "/static/files/books/2bac/general/coding/ar/20260909155301_cdf712__.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "البرمجة بلغة بايثون",
+      "filename": "20260909155241_ff4ded__.pdf",
+      "size": 4758979,
+      "modified": "2026-09-09T15:52:41.334444",
+      "url": "/static/files/books/2bac/general/coding/ar/20260909155241_ff4ded__.pdf",
+      "kind": "book"
+    }
+  ]
+}

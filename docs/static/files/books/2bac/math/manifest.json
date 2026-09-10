@@ -1,35 +1,11 @@
 {
   "documents": [
     {
-      "title": "Dima Dima 2bac sm - Limites et continuité",
-      "filename": "20260908202534_76dced__01-limite_et_continuit_-dima_dima-2_bac_sm.pdf",
-      "size": 23052155,
-      "modified": "2026-09-08T20:25:34.063077",
-      "url": "/static/files/books/2bac/math/20260908202534_76dced__01-limite_et_continuit_-dima_dima-2_bac_sm.pdf",
-      "kind": "book"
-    },
-    {
-      "title": "Ultra Math 2 Bac PC/SVT",
-      "filename": "20260907132231_c0dec1_ultra_math.pdf",
-      "size": 58059770,
-      "modified": "2026-09-07T13:22:31.521792",
-      "url": "/static/files/books/2bac/math/20260907132231_c0dec1_ultra_math.pdf",
-      "kind": "book"
-    },
-    {
-      "title": "Maxi Math 2 Bac PC/SVT - Tome 2",
-      "filename": "20260907132011_44eb7f_maxi_math_2bac_pc_et_svt_tome_2.pdf",
-      "size": 54278274,
-      "modified": "2026-09-07T13:20:11.442769",
-      "url": "/static/files/books/2bac/math/20260907132011_44eb7f_maxi_math_2bac_pc_et_svt_tome_2.pdf",
-      "kind": "book"
-    },
-    {
-      "title": "Maxi Math 2 Bac PC/SVT - Tome 1",
-      "filename": "20260907131940_54b782_maxi_math_2bac_pc_svt_tome_1.pdf",
-      "size": 45455334,
-      "modified": "2026-09-07T13:19:40.861259",
-      "url": "/static/files/books/2bac/math/20260907131940_54b782_maxi_math_2bac_pc_svt_tome_1.pdf",
+      "title": "Maxi Maths 2 Bac SM A et B Tome 1",
+      "filename": "20260905160756_0edd7d_maxi_maths_2_bac_sm_a_et_b_tome_1.pdf",
+      "size": 60909235,
+      "modified": "2026-09-05T16:07:56.795468",
+      "url": "/static/files/books/math/20260905160756_0edd7d_maxi_maths_2_bac_sm_a_et_b_tome_1.pdf",
       "kind": "book"
     },
     {
@@ -65,11 +41,35 @@
       "kind": "book"
     },
     {
-      "title": "Maxi Maths 2 Bac SM A et B Tome 1",
-      "filename": "20260905160756_0edd7d_maxi_maths_2_bac_sm_a_et_b_tome_1.pdf",
-      "size": 60909235,
-      "modified": "2026-09-05T16:07:56.795468",
-      "url": "/static/files/books/math/20260905160756_0edd7d_maxi_maths_2_bac_sm_a_et_b_tome_1.pdf",
+      "title": "Maxi Math 2 Bac PC/SVT - Tome 1",
+      "filename": "20260907131940_54b782_maxi_math_2bac_pc_svt_tome_1.pdf",
+      "size": 45455334,
+      "modified": "2026-09-07T13:19:40.861259",
+      "url": "/static/files/books/2bac/math/20260907131940_54b782_maxi_math_2bac_pc_svt_tome_1.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Maxi Math 2 Bac PC/SVT - Tome 2",
+      "filename": "20260907132011_44eb7f_maxi_math_2bac_pc_et_svt_tome_2.pdf",
+      "size": 54278274,
+      "modified": "2026-09-07T13:20:11.442769",
+      "url": "/static/files/books/2bac/math/20260907132011_44eb7f_maxi_math_2bac_pc_et_svt_tome_2.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Dima Dima 2bac sm - Limites et continuité",
+      "filename": "20260908202534_76dced__01-limite_et_continuit_-dima_dima-2_bac_sm.pdf",
+      "size": 23052155,
+      "modified": "2026-09-08T20:25:34.063077",
+      "url": "/static/files/books/2bac/math/20260908202534_76dced__01-limite_et_continuit_-dima_dima-2_bac_sm.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Ultra Math 2 Bac PC/SVT",
+      "filename": "20260907132231_c0dec1_ultra_math.pdf",
+      "size": 58059770,
+      "modified": "2026-09-07T13:22:31.521792",
+      "url": "/static/files/books/2bac/math/20260907132231_c0dec1_ultra_math.pdf",
       "kind": "book"
     }
   ]

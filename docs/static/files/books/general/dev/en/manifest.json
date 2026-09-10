@@ -1,0 +1,36 @@
+{
+  "documents": [
+    {
+      "title": "The Power of Habit",
+      "filename": "20260909155136_e74e3b_the_power_of_habit.pdf",
+      "size": 10346286,
+      "modified": "2026-09-09T15:51:36.060404",
+      "url": "/static/files/books/2bac/general/dev/en/20260909155136_e74e3b_the_power_of_habit.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "The Mountain Is You",
+      "filename": "20260909155114_653442_the_mountain_is_you.pdf",
+      "size": 1014173,
+      "modified": "2026-09-09T15:51:14.176688",
+      "url": "/static/files/books/2bac/general/dev/en/20260909155114_653442_the_mountain_is_you.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "The 7 Habits of Highly Effective People",
+      "filename": "20260909154645_6d7d09_the_7_habits_of_highly_effective_people.pdf",
+      "size": 4626938,
+      "modified": "2026-09-09T15:46:45.925456",
+      "url": "/static/files/books/2bac/general/dev/en/20260909154645_6d7d09_the_7_habits_of_highly_effective_people.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "Atomic Habits - James Clair",
+      "filename": "20260909154629_80cc96_atomic_habits.pdf",
+      "size": 5947112,
+      "modified": "2026-09-09T15:46:29.342667",
+      "url": "/static/files/books/2bac/general/dev/en/20260909154629_80cc96_atomic_habits.pdf",
+      "kind": "book"
+    }
+  ]
+}
