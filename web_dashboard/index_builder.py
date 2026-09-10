@@ -18,16 +18,35 @@ def human_title(filename):
 
 
 def read_manifest(directory):
-    """Lit le manifest.json d'un dossier et renvoie un dict filename → entry."""
+    """Lit le manifest.json d'un dossier et renvoie un dict filename → entry.
+    L'ordre d'insertion est conservé (dict Python ordonné), ce qui permet au
+    site de respecter l'ordre d'upload / réordonnancement opéré via le dashboard.
+    """
     path = os.path.join(directory, "manifest.json")
     if not os.path.isfile(path):
         return {}
+    ordered = {}
     try:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        return {d["filename"]: d for d in data.get("documents", []) if "filename" in d}
+        for d in data.get("documents", []):
+            if "filename" in d:
+                ordered[d["filename"]] = d
     except (json.JSONDecodeError, OSError):
         return {}
+    return ordered
+
+
+def ordered_entries(directory, folders, prefix, manifest_entries):
+    """Construit la liste des documents d'un dossier :
+    d'abord dans l'ordre du manifest, puis les PDF non référencés (triés)."""
+    present = [f for f in folders if f.lower().endswith(".pdf")]
+    present_set = set(present)
+    ordered = [entry_for(directory, fn, prefix, manifest_entries)
+               for fn in manifest_entries if fn in present_set]
+    for fn in sorted(present_set - set(manifest_entries)):
+        ordered.append(entry_for(directory, fn, prefix, manifest_entries))
+    return ordered
 
 
 def entry_for(directory, filename, prefix, manifest_entries):
@@ -107,21 +126,38 @@ def build_index(files_dir):
     bdir = os.path.join(files_dir, "books")
     for level in sorted(os.listdir(bdir)):
         lvl = os.path.join(bdir, level)
-        if not os.path.isdir(lvl):
+        if level == "general" or not os.path.isdir(lvl):  # general : dossier partagé, pas un niveau
             continue
         books[level] = {}
-        for subject in ("math", "pc", "autres"):
-            sb = os.path.join(lvl, subject)
-            books[level][subject] = []
-            if os.path.isdir(sb):
-                manifest_entries = read_manifest(sb)
-                for filename in sorted(os.listdir(sb)):
-                    if filename.lower().endswith(".pdf"):
-                        books[level][subject].append(
-                            entry_for(sb, filename, f"books/{level}/{subject}", manifest_entries)
-                        )
+        # Parcours récursif : math, pc, autres (+ sous-dossiers éventuels).
+        # Apparents au dossier "livres" par leur chemin relatif au niveau.
+        for root, _dirs, files in os.walk(lvl):
+            if os.path.abspath(root) == os.path.abspath(lvl):
+                continue
+            pdfs = [f for f in files if f.lower().endswith(".pdf")]
+            if not pdfs:
+                continue
+            rel = os.path.relpath(root, lvl).replace("\\", "/")
+            manifest_entries = read_manifest(root)
+            books[level][rel] = ordered_entries(root, files, f"books/{level}/{rel}", manifest_entries)
 
-    index = {"lessons": lessons, "books": books, "generated": datetime.now().isoformat()}
+    # General Books : dossier partagé books/general, stocké UNE seule fois.
+    # Les documents ne sont jamais copiés ; les mêmes fichiers sont listés
+    # pour tous les niveaux via la section "books_general" (site + dashboard).
+    general_tree = {}
+    general_dir = os.path.join(bdir, "general")
+    if os.path.isdir(general_dir):
+        for root, _dirs, files in os.walk(general_dir):
+            if os.path.abspath(root) == os.path.abspath(general_dir):
+                continue
+            pdfs = [f for f in files if f.lower().endswith(".pdf")]
+            if not pdfs:
+                continue
+            rel = "general/" + os.path.relpath(root, general_dir).replace("\\", "/")
+            manifest_entries = read_manifest(root)
+            general_tree[rel] = ordered_entries(root, files, f"books/{rel}", manifest_entries)
+
+    index = {"lessons": lessons, "books": books, "books_general": general_tree, "generated": datetime.now().isoformat()}
     js = "window.INDEX = " + json.dumps(index, ensure_ascii=False, indent=2) + ";\n"
     static_dir = os.path.dirname(files_dir)
     out = os.path.join(static_dir, OUTPUT_NAME)

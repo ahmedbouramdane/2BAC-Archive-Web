@@ -50,6 +50,36 @@
     }
     .panel h2 i { color: var(--primary); }
 
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 22px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px;
+    }
+    .tab-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .tab-btn:hover { color: var(--primary); }
+    .tab-btn.active { background: var(--primary); color: var(--on-primary); }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -122,6 +152,7 @@
     @media (max-width: 640px) {
       .span-2 { grid-column: span 1; }
       .grid { grid-template-columns: 1fr; }
+      .tabs { flex-direction: column; }
     }
   </style>
 </head>
@@ -134,6 +165,16 @@
   </header>
 
   <main class="wrap">
+    <div class="tabs">
+      <button type="button" class="tab-btn active" data-tab="upload" role="tab" aria-selected="true">
+        <i class="fas fa-cloud-upload-alt"></i> Uploader
+      </button>
+      <button type="button" class="tab-btn" data-tab="manage" role="tab" aria-selected="false">
+        <i class="fas fa-folder-open"></i> Gérer &amp; Modifier
+      </button>
+    </div>
+
+    <div class="tab-pane active" id="tab-upload">
     <div class="hint">
       <i class="fas fa-info-circle"></i>
       Le site statique lit les dossiers static/files via les manifest.json générés automatiquement ici.
@@ -224,6 +265,46 @@
     </section>
 
     <section class="panel">
+      <h2><i class="fas fa-bookmark"></i> Uploader un livre général</h2>
+      <form id="generalBookForm">
+        <input type="hidden" name="subject" value="general">
+        <div class="grid">
+          <div class="field">
+            <label for="gb_section">Section</label>
+            <select id="gb_section" name="section">
+              <option value="islamic">Islamic</option>
+              <option value="dev">Personal Development</option>
+              <option value="coding">Coding</option>
+            </select>
+          </div>
+          <div class="field" id="gb_lang_field" hidden>
+            <label for="gb_lang">Langue</label>
+            <select id="gb_lang" name="lang">
+              <option value="en">EN - English</option>
+              <option value="ar">AR - Arabic</option>
+            </select>
+          </div>
+          <div class="field span-2">
+            <label for="gb_title">Titre du livre</label>
+            <input type="text" id="gb_title" name="title" placeholder="Ex : Atomic Habits (EN)" required>
+          </div>
+          <div class="field span-2">
+            <label for="gb_file">Fichier (PDF)</label>
+            <input type="file" id="gb_file" name="file" accept="application/pdf" required>
+          </div>
+          <div class="span-2">
+            <button class="btn btn-primary" type="submit" id="gb_btn">
+              <i class="fas fa-cloud-upload-alt"></i> Uploader le livre général
+            </button>
+          </div>
+        </div>
+      </form>
+    </section>
+    </div>
+    <!-- /fin panneau Uploader -->
+
+    <div class="tab-pane" id="tab-manage">
+    <section class="panel">
       <h2><i class="fas fa-folder-open"></i> Gérer les fichiers existants</h2>
       <div class="grid">
         <div class="field">
@@ -262,39 +343,71 @@
     </section>
 
     <section class="panel">
-      <h2><i class="fas fa-bookmark"></i> Gérer les livres existants</h2>
+      <h2><i class="fas fa-book"></i> Gérer les livres scolaires (Math, PC...)</h2>
       <div class="grid">
         <div class="field">
-          <label for="bk_mg_level">Niveau</label>
-          <select id="bk_mg_level">
+          <label for="bkS_mg_level">Niveau</label>
+          <select id="bkS_mg_level">
             <option value="2bac">2 BAC</option>
             <option value="1bac">1 BAC</option>
             <option value="tc">TC</option>
           </select>
         </div>
         <div class="field">
-          <label for="bk_mg_subject">Matière</label>
-          <select id="bk_mg_subject">
+          <label for="bkS_mg_subject">Matière</label>
+          <select id="bkS_mg_subject">
             <option value="math">Mathématiques</option>
             <option value="pc">Physique &amp; Chimie</option>
             <option value="autres">Autres</option>
           </select>
         </div>
         <div class="span-2">
-          <button class="btn btn-primary" type="button" id="bk_mg_load">
+          <button class="btn btn-primary" type="button" id="bkS_mg_load">
             <i class="fas fa-sync-alt"></i> Charger les livres
           </button>
         </div>
       </div>
-      <div id="bk_mg_list" style="margin-top:18px;"></div>
+      <div id="bkS_mg_list" style="margin-top:18px;"></div>
     </section>
+
+    <section class="panel">
+      <h2><i class="fas fa-bookmark"></i> Gérer les livres généraux</h2>
+      <div class="grid">
+        <div class="field">
+          <label for="bkG_mg_section">Section</label>
+          <select id="bkG_mg_section">
+            <option value="islamic">Islamic</option>
+            <option value="dev">Personal Development</option>
+            <option value="coding">Coding</option>
+          </select>
+        </div>
+        <div class="field" id="bkG_mg_lang_field" hidden>
+          <label for="bkG_mg_lang">Langue</label>
+          <select id="bkG_mg_lang">
+            <option value="en">EN - English</option>
+            <option value="ar">AR - Arabic</option>
+          </select>
+        </div>
+        <div class="span-2">
+          <button class="btn btn-primary" type="button" id="bkG_mg_load">
+            <i class="fas fa-sync-alt"></i> Charger les livres
+          </button>
+        </div>
+      </div>
+      <div id="bkG_mg_list" style="margin-top:18px;"></div>
+    </section>
+    </div>
+    <!-- /fin panneau Gérer & Modifier -->
   </main>
 
   <!-- Rename modal -->
   <div id="renameModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center;">
     <div style="background:var(--card);border-radius:10px;padding:24px;max-width:440px;width:90%;margin:auto;margin-top:20vh;">
-      <h3 style="margin-bottom:14px;font-size:1.05rem;"><i class="fas fa-edit"></i> Modifier le titre</h3>
+      <h3 style="margin-bottom:14px;font-size:1.05rem;"><i class="fas fa-edit"></i> Modifier</h3>
+      <div id="renameCurrentFile" style="font-size:.82rem;color:var(--muted);margin-bottom:12px;word-break:break-all;"></div>
       <input type="text" id="renameInput" placeholder="Nouveau titre" style="padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-size:.95rem;width:100%;margin-bottom:14px;">
+      <label style="display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;">Remplacer le fichier (optionnel)</label>
+      <input type="file" id="renameFileInput" accept=".pdf,application/pdf" style="margin-bottom:16px;font-size:.85rem;">
       <div style="display:flex;gap:10px;justify-content:flex-end;">
         <button class="btn" id="renameCancel" style="background:var(--bg);border:1px solid var(--border);">Annuler</button>
         <button class="btn btn-primary" id="renameSave"><i class="fas fa-check"></i> Enregistrer</button>
@@ -316,6 +429,16 @@
     .file-actions .del-btn { color:#dc2626; }
     .file-actions .del-btn:hover { background:#fef2f2; }
     .no-files { color:var(--muted); font-size:.9rem; padding:16px 0; }
+    table.file-table.bookTable tr { cursor: grab; }
+    table.file-table.bookTable tr.dragging { opacity: .4; }
+    table.file-table.bookTable tr.drag-over td { border-top: 2px solid var(--primary); }
+    .drag-cell { white-space: nowrap; }
+    .drag-handle { color: var(--muted); padding: 2px 4px; }
+    .order-arrows { display: inline-flex; flex-direction: column; vertical-align: middle; margin-left: 4px; }
+    .ord-btn { background: none; border: 0; color: var(--muted); cursor: pointer; padding: 1px 3px; font-size: .78rem; line-height: 1.1; }
+    .ord-btn:disabled { opacity: .3; cursor: default; }
+    .ord-btn:hover:not(:disabled) { color: var(--primary); }
+    .file-actions .edit-btn, .file-actions .del-btn { cursor: pointer; }
   </style>
 
   <script>
@@ -323,6 +446,11 @@
       '2bac': { label: '2 BAC', math: 13, pc: 32 },
       '1bac': { label: '1 BAC', math: 17, pc: 29 },
       'tc': { label: 'TC', math: 15, pc: 23 }
+    };
+    var GENERAL_SECTIONS = {
+      'islamic': { name: 'Islamic' },
+      'dev': { name: 'Personal Development', langs: ['en', 'ar'] },
+      'coding': { name: 'Coding', langs: ['en', 'ar'] }
     };
     var toastTimeout;
 
@@ -349,6 +477,20 @@
         opt.textContent = ('0' + i).slice(-2);
         sel.appendChild(opt);
       }
+    }
+
+    /* --- Panel "livres généraux" : langue visible selon la section --- */
+    function fillGeneralCats() {
+      var info = GENERAL_SECTIONS[document.getElementById('gb_section').value];
+      var langField = document.getElementById('gb_lang_field');
+      langField.hidden = !(info && info.langs);
+    }
+
+    /* --- Panel "Gérer les livres généraux" : langue visible selon la section --- */
+    function fillGeneralManageCats() {
+      var info = GENERAL_SECTIONS[document.getElementById('bkG_mg_section').value];
+      var langField = document.getElementById('bkG_mg_lang_field');
+      langField.hidden = !(info && info.langs);
     }
 
     /* --- Upload form binding --- */
@@ -435,49 +577,163 @@
     }
 
     /* --- Book management --- */
-    function loadBooks() {
-      var level = document.getElementById('bk_mg_level').value;
-      var subject = document.getElementById('bk_mg_subject').value;
-      var container = document.getElementById('bk_mg_list');
-      container.innerHTML = '<p class="no-files"><i class="fas fa-spinner fa-spin"></i> Chargement...</p>';
+    // Deux contextes indépendants : 'school' (livres scolaires) et 'general' (livres généraux)
+    var bookStore = { school: [], general: [] };
+    var renameBookCtx = 'school';
 
-      fetch('api/books?level=' + encodeURIComponent(level) + '&subject=' + encodeURIComponent(subject))
+    function bookContainer(kind) {
+      return document.getElementById(kind === 'school' ? 'bkS_mg_list' : 'bkG_mg_list');
+    }
+
+    function bookParamsForCtx(kind, append) {
+      if (kind === 'school') {
+        append('level', document.getElementById('bkS_mg_level').value);
+        append('subject', document.getElementById('bkS_mg_subject').value);
+      } else {
+        var info = GENERAL_SECTIONS[document.getElementById('bkG_mg_section').value];
+        append('subject', 'general');
+        append('section', document.getElementById('bkG_mg_section').value);
+        if (info && info.langs) append('lang', document.getElementById('bkG_mg_lang').value);
+      }
+    }
+
+    function renderBookList(kind) {
+      var container = bookContainer(kind);
+      var data = bookStore[kind];
+      if (!data || data.length === 0) {
+        container.innerHTML = '<p class="no-files">Aucun livre pour cette sélection.</p>';
+        return;
+      }
+      var html = '<table class="file-table bookTable"><thead><tr><th style="width:96px;">Ordre</th><th>Titre</th><th>Actions</th></tr></thead><tbody>';
+      data.forEach(function (doc, i) {
+        var fn = doc.filename;
+        html += '<tr data-fn="' + fn + '" data-idx="' + i + '" draggable="true">' +
+          '<td class="drag-cell">' +
+          '  <span class="drag-handle" title="Glisser pour réordonner"><i class="fas fa-grip-vertical"></i></span>' +
+          '  <div class="order-arrows">' +
+          '    <button class="ord-btn" type="button" title="Monter" onclick="moveBook(\'' + kind + '\', \'' + fn + '\', -1)"' + (i === 0 ? ' disabled' : '') + '><i class="fas fa-chevron-up"></i></button>' +
+          '    <button class="ord-btn" type="button" title="Descendre" onclick="moveBook(\'' + kind + '\', \'' + fn + '\', 1)"' + (i === data.length - 1 ? ' disabled' : '') + '><i class="fas fa-chevron-down"></i></button>' +
+          '  </div>' +
+          '</td>' +
+          '<td>' + esc(doc.title) + '</td>' +
+          '<td class="file-actions">' +
+          '  <button class="edit-btn" onclick="renameBook(\'' + kind + '\', \'' + esc(doc.filename) + '\', \'' + esc(doc.title).replace(/'/g, "\\'") + '\')"><i class="fas fa-pen"></i> Modifier</button>' +
+          '  <button class="del-btn" onclick="deleteBook(\'' + kind + '\', \'' + esc(doc.filename) + '\')"><i class="fas fa-trash"></i> Supprimer</button>' +
+          '</td></tr>';
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+      bindBookDrag(kind);
+    }
+
+    function loadBooks(kind) {
+      var container = bookContainer(kind);
+      container.innerHTML = '<p class="no-files"><i class="fas fa-spinner fa-spin"></i> Chargement...</p>';
+      var params = [];
+      var enc = encodeURIComponent;
+      bookParamsForCtx(kind, function (k, v) { params.push(k + '=' + enc(v)); });
+
+      fetch('api/books?' + params.join('&'))
         .then(function (r) { return r.json(); })
         .then(function (data) {
           if (!data.ok || !data.books || data.books.length === 0) {
-            container.innerHTML = '<p class="no-files">Aucun livre pour cette matière.</p>';
+            bookStore[kind] = [];
+            renderBookList(kind);
             return;
           }
-          var html = '<table class="file-table"><thead><tr><th>Titre</th><th>Fichier</th><th>Taille</th><th>Actions</th></tr></thead><tbody>';
-          data.books.forEach(function (doc) {
-            var size = doc.size ? (doc.size < 1024 ? doc.size + ' o' : (doc.size / 1024).toFixed(1) + ' Ko') : '';
-            html += '<tr>' +
-              '<td>' + esc(doc.title) + '</td>' +
-              '<td style="font-size:.82rem;color:var(--muted);">' + esc(doc.filename) + '</td>' +
-              '<td>' + size + '</td>' +
-              '<td class="file-actions">' +
-              '  <button class="edit-btn" onclick="renameBook(\'' + esc(doc.filename) + '\', \'' + esc(doc.title).replace(/'/g, "\\'") + '\')"><i class="fas fa-pen"></i> Modifier</button>' +
-              '  <button class="del-btn" onclick="deleteBook(\'' + esc(doc.filename) + '\')"><i class="fas fa-trash"></i> Supprimer</button>' +
-              '</td></tr>';
-          });
-          html += '</tbody></table>';
-          container.innerHTML = html;
+          bookStore[kind] = data.books.slice();
+          renderBookList(kind);
         })
         .catch(function () {
           container.innerHTML = '<p class="no-files">Erreur lors du chargement.</p>';
         });
     }
 
-    function deleteBook(filename) {
+    function saveBookOrder(kind) {
+      var fd = new FormData();
+      bookParamsForCtx(kind, function (k, v) { fd.append(k, v); });
+      bookStore[kind].forEach(function (d) { fd.append('filenames', d.filename); });
+      fetch('api/books/reorder', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (j.ok) showToast('Ordre mis à jour.');
+          else showToast(j.detail || 'Erreur lors du réordonnancement.');
+          loadBooks(kind);
+        })
+        .catch(function () { showToast('Erreur réseau.'); loadBooks(kind); });
+    }
+
+    function moveBook(kind, filename, delta) {
+      var data = bookStore[kind];
+      var i = -1;
+      for (var k = 0; k < data.length; k++) if (data[k].filename === filename) { i = k; break; }
+      if (i < 0) return;
+      var j = i + delta;
+      if (j < 0 || j >= data.length) return;
+      var item = data.splice(i, 1)[0];
+      data.splice(j, 0, item);
+      renderBookList(kind);
+      saveBookOrder(kind);
+    }
+
+    function bindBookDrag(kind) {
+      var container = bookContainer(kind);
+      var dragIdx = -1;
+      var rows = container.querySelectorAll('table.bookTable tbody tr');
+      rows.forEach(function (row) {
+        row.addEventListener('dragstart', function (e) {
+          dragIdx = parseInt(row.getAttribute('data-idx'), 10);
+          row.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', row.getAttribute('data-fn') || '');
+        });
+        row.addEventListener('dragover', function (e) {
+          e.preventDefault();
+          if (dragIdx < 0) return;
+          var rect = row.getBoundingClientRect();
+          row.classList.toggle('drag-over', e.clientY > rect.top + rect.height / 2);
+        });
+        row.addEventListener('dragenter', function (e) { e.preventDefault(); });
+        row.addEventListener('dragleave', function () {
+          row.classList.remove('drag-over');
+          row.classList.remove('dragging');
+        });
+        row.addEventListener('drop', function (e) {
+          e.preventDefault();
+          row.classList.remove('drag-over');
+          if (dragIdx < 0) return;
+          var data = bookStore[kind];
+          var targetIdx = parseInt(row.getAttribute('data-idx'), 10);
+          var rect = row.getBoundingClientRect();
+          var before = e.clientY <= rect.top + rect.height / 2;
+          if (!before) targetIdx += 1;
+          if (targetIdx < 0) targetIdx = 0;
+          if (targetIdx > data.length) targetIdx = data.length;
+          if (targetIdx !== dragIdx && targetIdx !== dragIdx + 1) {
+            var item = data.splice(dragIdx, 1)[0];
+            data.splice(dragIdx < targetIdx ? targetIdx - 1 : targetIdx, 0, item);
+          }
+          dragIdx = -1;
+          rows.forEach(function (r) { r.classList.remove('dragging', 'drag-over'); });
+          renderBookList(kind);
+          saveBookOrder(kind);
+        });
+      });
+      container.addEventListener('dragend', function () {
+        dragIdx = -1;
+        rows.forEach(function (r) { r.classList.remove('dragging', 'drag-over'); });
+      });
+    }
+
+    function deleteBook(kind, filename) {
       if (!confirm('Supprimer ce livre ? Cette action est irréversible.')) return;
       var fd = new FormData();
-      fd.append('level', document.getElementById('bk_mg_level').value);
-      fd.append('subject', document.getElementById('bk_mg_subject').value);
+      bookParamsForCtx(kind, function (k, v) { fd.append(k, v); });
       fd.append('filename', filename);
       fetch('api/books/delete', { method: 'POST', body: fd })
         .then(function (r) { return r.json(); })
         .then(function (j) {
-          if (j.ok) { showToast('Livre supprimé.'); loadBooks(); }
+          if (j.ok) { showToast('Livre supprimé.'); loadBooks(kind); }
           else { showToast(j.detail || 'Erreur'); }
         })
         .catch(function () { showToast('Erreur réseau.'); });
@@ -485,18 +741,26 @@
 
     var renameTarget = '';
     var renameKind = 'lesson';
+    function openRenameModal() {
+      document.getElementById('renameFileInput').value = '';
+      document.getElementById('renameModal').style.display = 'flex';
+    }
+
     function renameFile(filename, currentTitle) {
       renameTarget = filename;
       renameKind = 'lesson';
       document.getElementById('renameInput').value = currentTitle;
-      document.getElementById('renameModal').style.display = 'flex';
+      document.getElementById('renameCurrentFile').textContent = filename;
+      openRenameModal();
     }
 
-    function renameBook(filename, currentTitle) {
+    function renameBook(kind, filename, currentTitle) {
       renameTarget = filename;
       renameKind = 'book';
+      renameBookCtx = kind;
       document.getElementById('renameInput').value = currentTitle;
-      document.getElementById('renameModal').style.display = 'flex';
+      document.getElementById('renameCurrentFile').textContent = filename;
+      openRenameModal();
     }
 
     document.getElementById('renameCancel').addEventListener('click', function () {
@@ -508,23 +772,25 @@
       if (!newTitle) { showToast('Le titre ne peut pas être vide.'); return; }
       var fd = new FormData();
       var isBook = renameKind === 'book';
-      fd.append('subject', isBook ? document.getElementById('bk_mg_subject').value : document.getElementById('mg_subject').value);
       if (isBook) {
-        fd.append('level', document.getElementById('bk_mg_level').value);
+        bookParamsForCtx(renameBookCtx, function (k, v) { fd.append(k, v); });
       } else {
         fd.append('level', document.getElementById('mg_level').value);
+        fd.append('subject', document.getElementById('mg_subject').value);
         fd.append('lesson', document.getElementById('mg_lesson').value);
         fd.append('type', document.getElementById('mg_type').value);
       }
       fd.append('filename', renameTarget);
       fd.append('title', newTitle);
+      var fileInput = document.getElementById('renameFileInput');
+      if (fileInput.files.length) { fd.append('file', fileInput.files[0]); }
       fetch(isBook ? 'api/books/rename' : 'api/rename', { method: 'POST', body: fd })
         .then(function (r) { return r.json(); })
         .then(function (j) {
           if (j.ok) {
-            showToast('Titre modifié.');
+            showToast(fileInput.files.length ? 'Fichier remplacé.' : 'Titre modifié.');
             document.getElementById('renameModal').style.display = 'none';
-            if (isBook) loadBooks(); else loadFiles();
+            if (isBook) loadBooks(renameBookCtx); else loadFiles();
           }
           else { showToast(j.detail || 'Erreur'); }
         })
@@ -544,19 +810,40 @@
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
+    /* --- Tabs --- */
+    document.querySelectorAll('.tab-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var name = btn.getAttribute('data-tab');
+        document.querySelectorAll('.tab-btn').forEach(function (b) {
+          var on = b === btn;
+          b.classList.toggle('active', on);
+          b.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        document.querySelectorAll('.tab-btn').length && document.querySelectorAll('.tab-pane').forEach(function (p) {
+          p.classList.toggle('active', p.id === 'tab-' + name);
+        });
+      });
+    });
+
     /* --- Init --- */
     document.getElementById('ls_level').addEventListener('change', fillLessons);
     document.getElementById('ls_subject').addEventListener('change', fillLessons);
     document.getElementById('mg_level').addEventListener('change', fillMgLessons);
     document.getElementById('mg_subject').addEventListener('change', fillMgLessons);
     document.getElementById('mg_load').addEventListener('click', loadFiles);
-    document.getElementById('bk_mg_load').addEventListener('click', loadBooks);
+    document.getElementById('bkS_mg_load').addEventListener('click', function () { loadBooks('school'); });
+    document.getElementById('bkG_mg_load').addEventListener('click', function () { loadBooks('general'); });
+    document.getElementById('gb_section').addEventListener('change', fillGeneralCats);
+    document.getElementById('bkG_mg_section').addEventListener('change', fillGeneralManageCats);
     document.addEventListener('DOMContentLoaded', function () { fillLessons(); fillMgLessons(); });
     fillLessons();
     fillMgLessons();
+    fillGeneralCats();
+    fillGeneralManageCats();
 
     bindForm('lessonForm', 'ls_btn', ['ls_title', 'ls_file'], 'api/upload');
     bindForm('bookForm', 'bk_btn', ['bk_title', 'bk_file'], 'api/upload-book');
+    bindForm('generalBookForm', 'gb_btn', ['gb_title', 'gb_file'], 'api/upload-book');
   </script>
 </body>
 </html>

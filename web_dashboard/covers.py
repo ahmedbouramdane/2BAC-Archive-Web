@@ -102,13 +102,12 @@ def ensure_covers(files_dir: str) -> int:
             lvl = os.path.join(books_dir, level)
             if not os.path.isdir(lvl):
                 continue
-            for subject in ("math", "pc", "autres"):
-                sdir = os.path.join(lvl, subject)
-                if not os.path.isdir(sdir):
+            for root, _dirs, files in os.walk(lvl):
+                if os.path.abspath(root) == os.path.abspath(lvl):
                     continue
-                for name in sorted(os.listdir(sdir)):
+                for name in sorted(files):
                     if name.lower().endswith(".pdf"):
-                        pdfs.append(os.path.join(sdir, name))
+                        pdfs.append(os.path.join(root, name))
 
     for pdf_path in pdfs:
         cover_path = cover_for(pdf_path)

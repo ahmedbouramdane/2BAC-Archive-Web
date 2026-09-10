@@ -24,6 +24,12 @@ LEVELS = {
 }
 SUBJECT_NAMES = {"math": "Mathématiques", "pc": "Physique & Chimie"}
 BOOK_SUBJECTS = {"math": "Mathématiques", "pc": "Physique & Chimie", "autres": "Autres"}
+# Sections "General Books" : mot-clé -> (nom, langues optionnelles)
+GENERAL_SECTIONS = {
+    "islamic": {"name": "Islamic"},
+    "dev": {"name": "Personal Development", "langs": ["en", "ar"]},
+    "coding": {"name": "Coding", "langs": ["en", "ar"]},
+}
 TYPES = {"c", "s"}
 
 app = FastAPI(title="2BAC SM Archive - Upload", version="3.1.0")
@@ -111,6 +117,50 @@ def register(directory: str, filename: str, title: str, url_prefix: str, kind: s
     return entry
 
 
+def replace_in_manifest(
+    directory: str,
+    filename: str,
+    title: str,
+    new_file: UploadFile | None,
+    not_found_detail: str = "Document non trouvé dans le manifest",
+) -> str:
+    """Met à jour l'entrée `filename` du manifest : change le titre et, si
+    `new_file` est fourni, remplace le PDF (suppression de l'ancien fichier)
+    en conservant la position de l'entrée dans le manifest."""
+    filepath = os.path.join(directory, filename)
+    if not os.path.isfile(filepath):
+        raise HTTPException(status_code=404, detail="Fichier introuvable")
+    documents = read_manifest(directory).get("documents", [])
+
+    new_filename = filename
+    replaced = False
+    if new_file is not None and new_file.filename:
+        os.remove(filepath)
+        cover = os.path.splitext(filepath)[0] + "_cover.png"
+        if os.path.isfile(cover):
+            os.remove(cover)
+        new_filename = save_pdf(new_file, directory)
+        replaced = True
+
+    found = False
+    for doc in documents:
+        if doc.get("filename") == filename:
+            doc["title"] = title.strip() or new_filename
+            doc["filename"] = new_filename
+            doc["size"] = os.path.getsize(os.path.join(directory, new_filename))
+            doc["modified"] = datetime.fromtimestamp(os.path.getmtime(os.path.join(directory, new_filename))).isoformat()
+            url_prefix = os.path.relpath(directory, FILES_DIR).replace(os.sep, "/") + "/"
+            doc["url"] = f"/static/files/{url_prefix}{new_filename}"
+            found = True
+            break
+    if not found:
+        raise HTTPException(status_code=404, detail=not_found_detail)
+    write_manifest(directory, documents)
+    if replaced:
+        ensure_covers(FILES_DIR)
+    return title.strip() or new_filename
+
+
 @app.on_event("startup")
 def generate_covers_on_startup():
     ensure_covers(FILES_DIR)
@@ -134,21 +184,42 @@ async def upload_lesson(
     return {"ok": True, "file": filename, "title": entry["title"], "url": entry["url"]}
 
 
+def book_dir(level: str, subject: str, section: str | None = None, lang: str | None = None) -> str:
+    """Valide matière, puis renvoie books/{level}/{subject} (livres scolaires)
+    ou books/general/{section}[/{lang}] (General Books, communs à tous les niveaux)."""
+    if subject == "general":
+        if section not in GENERAL_SECTIONS:
+            raise HTTPException(status_code=400, detail="Section invalide")
+        info = GENERAL_SECTIONS[section]
+        base = os.path.join(FILES_DIR, "books", "general", section)
+        if "langs" in info:
+            if lang not in info["langs"]:
+                raise HTTPException(status_code=400, detail="Langue invalide")
+            return os.path.join(base, lang)
+        return base
+    if level not in LEVELS:
+        raise HTTPException(status_code=400, detail="Niveau invalide")
+    if subject in ("math", "pc", "autres"):
+        if section or lang:
+            raise HTTPException(status_code=400, detail="Section/langue inattendue pour cette matière")
+        return os.path.join(FILES_DIR, "books", level, subject)
+    raise HTTPException(status_code=400, detail="Matière invalide")
+
+
 @app.post("/api/upload-book")
 async def upload_book(
-    level: str = Form(...),
+    level: str = Form(None),
     subject: str = Form(...),
+    section: str = Form(None),
+    lang: str = Form(None),
     title: str = Form(...),
     file: UploadFile = File(...),
 ):
-    if level not in LEVELS:
-        raise HTTPException(status_code=400, detail="Niveau invalide")
-    if subject not in BOOK_SUBJECTS:
-        raise HTTPException(status_code=400, detail="Matière invalide")
-    directory = os.path.join(FILES_DIR, "books", level, subject)
+    directory = book_dir(level, subject, section, lang)
     os.makedirs(directory, exist_ok=True)
     filename = save_pdf(file, directory)
-    entry = register(directory, filename, title, f"books/{level}/{subject}/", kind="book")
+    url_prefix = os.path.relpath(directory, FILES_DIR).replace("\\", "/") + "/"
+    entry = register(directory, filename, title, url_prefix, kind="book")
     ensure_covers(FILES_DIR)
     build_index(FILES_DIR)
     return {"ok": True, "file": filename, "title": entry["title"], "url": entry["url"]}
@@ -197,50 +268,34 @@ async def rename_document(
     type_: str = Form(..., alias="type"),
     filename: str = Form(...),
     title: str = Form(...),
+    file: UploadFile = File(None),
 ):
-    """Modifie le titre d'un document dans le manifest."""
+    """Modifie le titre d'un document dans le manifest. Si un nouveau fichier
+    est fourni, il remplace l'ancien (suppression + sauvegarde)."""
     directory, _ = lesson_dir(level, subject, lesson, type_)
-    filepath = os.path.join(directory, filename)
-    if not os.path.isfile(filepath):
-        raise HTTPException(status_code=404, detail="Fichier introuvable")
-    documents = read_manifest(directory).get("documents", [])
-    found = False
-    for doc in documents:
-        if doc.get("filename") == filename:
-            doc["title"] = title.strip() or filename
-            found = True
-            break
-    if not found:
-        raise HTTPException(status_code=404, detail="Document non trouvé dans le manifest")
-    write_manifest(directory, documents)
+    new_title = replace_in_manifest(directory, filename, title, file)
     build_index(FILES_DIR)
-    return {"ok": True, "title": title.strip() or filename}
+    return {"ok": True, "title": new_title}
 
 
 @app.get("/api/books")
-def list_books(level: str, subject: str):
-    """Renvoie la liste des livres (manifest des books/{level}/{subject})."""
-    if level not in LEVELS:
-        raise HTTPException(status_code=400, detail="Niveau invalide")
-    if subject not in BOOK_SUBJECTS:
-        raise HTTPException(status_code=400, detail="Matière invalide")
-    directory = os.path.join(FILES_DIR, "books", level, subject)
+def list_books(level: str = None, subject: str = ..., section: str = None, lang: str = None):
+    """Renvoie la liste des livres (manifest du dossier books correspondant)."""
+    directory = book_dir(level, subject, section, lang)
     manifest = read_manifest(directory)
     return {"ok": True, "books": manifest.get("documents", [])}
 
 
 @app.post("/api/books/delete")
 async def delete_book(
-    level: str = Form(...),
+    level: str = Form(None),
     subject: str = Form(...),
+    section: str = Form(None),
+    lang: str = Form(None),
     filename: str = Form(...),
 ):
     """Supprime un livre PDF (et sa couverture) puis met à jour le manifest."""
-    if level not in LEVELS:
-        raise HTTPException(status_code=400, detail="Niveau invalide")
-    if subject not in BOOK_SUBJECTS:
-        raise HTTPException(status_code=400, detail="Matière invalide")
-    directory = os.path.join(FILES_DIR, "books", level, subject)
+    directory = book_dir(level, subject, section, lang)
     filepath = os.path.join(directory, filename)
     if not os.path.isfile(filepath):
         raise HTTPException(status_code=404, detail="Fichier introuvable")
@@ -256,32 +311,47 @@ async def delete_book(
 
 @app.post("/api/books/rename")
 async def rename_book(
-    level: str = Form(...),
+    level: str = Form(None),
     subject: str = Form(...),
+    section: str = Form(None),
+    lang: str = Form(None),
     filename: str = Form(...),
     title: str = Form(...),
+    file: UploadFile = File(None),
 ):
-    """Modifie le titre d'un livre dans le manifest."""
-    if level not in LEVELS:
-        raise HTTPException(status_code=400, detail="Niveau invalide")
-    if subject not in BOOK_SUBJECTS:
-        raise HTTPException(status_code=400, detail="Matière invalide")
-    directory = os.path.join(FILES_DIR, "books", level, subject)
-    filepath = os.path.join(directory, filename)
-    if not os.path.isfile(filepath):
-        raise HTTPException(status_code=404, detail="Fichier introuvable")
-    documents = read_manifest(directory).get("documents", [])
-    found = False
-    for doc in documents:
-        if doc.get("filename") == filename:
-            doc["title"] = title.strip() or filename
-            found = True
-            break
-    if not found:
-        raise HTTPException(status_code=404, detail="Livre non trouvé dans le manifest")
+    """Modifie le titre d'un livre dans le manifest. Si un nouveau fichier
+    est fourni, il remplace l'ancien (suppression + sauvegarde)."""
+    directory = book_dir(level, subject, section, lang)
+    new_title = replace_in_manifest(
+        directory,
+        filename,
+        title,
+        file,
+        not_found_detail="Livre non trouvé dans le manifest",
+    )
+    build_index(FILES_DIR)
+    return {"ok": True, "title": new_title}
+
+
+@app.post("/api/books/reorder")
+async def reorder_books(
+    level: str = Form(None),
+    subject: str = Form(...),
+    section: str = Form(None),
+    lang: str = Form(None),
+    filenames: list[str] = Form(...),
+):
+    """Réordonne les livres d'un dossier : réécrit le manifest dans le nouvel ordre."""
+    directory = book_dir(level, subject, section, lang)
+    manifest = read_manifest(directory).get("documents", [])
+    valid = {d.get("filename") for d in manifest}
+    if set(filenames) != valid:
+        raise HTTPException(status_code=400, detail="Liste de livres incomplète ou invalide")
+    by_name = {d.get("filename"): d for d in manifest}
+    documents = [by_name[fn] for fn in filenames]
     write_manifest(directory, documents)
     build_index(FILES_DIR)
-    return {"ok": True, "title": title.strip() or filename}
+    return {"ok": True}
 
 
 @app.get("/dashboard")
