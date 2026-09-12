@@ -105,6 +105,34 @@
     <i class="fas fa-wifi"></i> Vous êtes hors ligne — les documents nécessitent une connexion.
   </div>
 
+  <!-- Desktop release announcement modal (shown to mobile/Android users on enter) -->
+  <div class="modal" id="desktopModal" role="dialog" aria-labelledby="desktopModalTitle"
+       aria-describedby="desktopModalDesc" aria-hidden="true">
+    <div class="modal-content">
+      <button type="button" class="modal-close" id="desktopModalClose" aria-label="Fermer">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="modal-illustration" aria-hidden="true">
+        <i class="fas fa-desktop"></i>
+      </div>
+      <h2 id="desktopModalTitle">Desktop version is ready!</h2>
+      <p id="desktopModalDesc" class="modal-text">
+        The developers have finally released the desktop version for Windows users.
+        Join us and discover the application on the My Apps Store.
+      </p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline modal-btn" id="desktopModalCancel">
+          <i class="fas fa-circle-xmark"></i> Cancel
+        </button>
+        <a href="https://ahmedbouramdane.github.io/My-Apps-Store/"
+           class="btn btn-primary modal-btn" id="desktopModalStore"
+           target="_blank" rel="noopener noreferrer">
+          <i class="fas fa-store"></i> Visit My Apps Store
+        </a>
+      </div>
+    </div>
+  </div>
+
   <script src="static/index-data.js"></script>
   <script src="js/data.js"></script>
   <script src="js/templates.js"></script>

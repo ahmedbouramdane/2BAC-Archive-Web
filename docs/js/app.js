@@ -100,6 +100,7 @@
     initNav();
     initBackToTop();
     initViewer();
+    initDesktopModal();
     window.addEventListener('hashchange', onHashChange);
     onHashChange();
   }
@@ -500,6 +501,7 @@
       a.setAttribute('href', value === 'books' ? '#/books/' + lvl : '#/' + lvl + '/' + value);
     });
     renderHistory();
+    if (window.__showDesktopModal) window.__showDesktopModal();
   }
 
   /* ---------- Reading uploaded files from generated index-data.js (window.INDEX) ---------- */
@@ -1555,5 +1557,51 @@ function pdfCenterPageNum() {
     document.getElementById('backToTop').addEventListener('click', function () {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+  }
+
+  /* ---------- Desktop release announcement modal ---------- */
+  var DESKTOP_MODAL_KEY = '2bac-desktop-modal-dismissed';
+
+  function initDesktopModal() {
+    var modal = document.getElementById('desktopModal');
+    if (!modal) return;
+
+    var closeBtn = modal.querySelector('#desktopModalClose');
+    var cancelBtn = modal.querySelector('#desktopModalCancel');
+    var storeLink = modal.querySelector('#desktopModalStore');
+
+    function hide() {
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      try { sessionStorage.setItem(DESKTOP_MODAL_KEY, '1'); } catch (e) { /* ignore */ }
+    }
+
+    function show() {
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function maybeShow() {
+      if (getPlatform() !== 'mobile') return;
+      var dismissed = false;
+      try { dismissed = sessionStorage.getItem(DESKTOP_MODAL_KEY) === '1'; } catch (e) { /* ignore */ }
+      if (dismissed) return;
+      if (parseRoute(window.location.hash).view !== 'home') return;
+      show();
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', hide);
+    if (cancelBtn) cancelBtn.addEventListener('click', hide);
+    if (storeLink) storeLink.addEventListener('click', hide);
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) hide();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal.classList.contains('show')) hide();
+    });
+
+    window.__showDesktopModal = maybeShow;
   }
 })();
