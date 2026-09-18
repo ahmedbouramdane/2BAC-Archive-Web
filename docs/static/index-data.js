@@ -244,6 +244,30 @@ window.INDEX = {
     "1bac": {
       "autres": [
         {
+          "title": "La Boîte à Merveilles",
+          "filename": "20260918125845_ee500e_la_bo_te_merveilles.pdf",
+          "size": 801036,
+          "modified": "2026-09-18T12:58:46",
+          "url": "/static/files/books/1bac/autres/20260918125845_ee500e_la_bo_te_merveilles.pdf",
+          "cover": "/static/files/books/1bac/autres/20260918125845_ee500e_la_bo_te_merveilles_cover.png"
+        },
+        {
+          "title": "Antigone",
+          "filename": "20260918125744_e40da4_antigone-texte-integral.pdf",
+          "size": 1962900,
+          "modified": "2026-09-18T12:57:46",
+          "url": "/static/files/books/1bac/autres/20260918125744_e40da4_antigone-texte-integral.pdf",
+          "cover": "/static/files/books/1bac/autres/20260918125744_e40da4_antigone-texte-integral_cover.png"
+        },
+        {
+          "title": "Le dernier Jour D'un Condamné",
+          "filename": "20260918125709_aa2ea7_djc_victor_hugo.pdf",
+          "size": 552254,
+          "modified": "2026-09-18T12:57:12",
+          "url": "/static/files/books/1bac/autres/20260918125709_aa2ea7_djc_victor_hugo.pdf",
+          "cover": "/static/files/books/1bac/autres/20260918125709_aa2ea7_djc_victor_hugo_cover.png"
+        },
+        {
           "title": "Chrono - Arabe",
           "filename": "20260907065219_f03c17_chrono_bac_arabe.pdf",
           "size": 26179784,
@@ -724,5 +748,5 @@ window.INDEX = {
       }
     ]
   },
-  "generated": "2026-09-10T17:51:14.023168"
+  "generated": "2026-09-18T12:58:46.526311"
 };
