@@ -390,22 +390,6 @@ window.INDEX = {
       ],
       "math": [
         {
-          "title": "Suites numériques 2BAC SMB",
-          "filename": "20260920192151_ed24d5__02-_suites_num_riques_2_bac_smb.pdf",
-          "size": 18766102,
-          "modified": "2026-09-20T19:21:54",
-          "url": "/static/files/books/2bac/math/20260920192151_ed24d5__02-_suites_num_riques_2_bac_smb.pdf",
-          "cover": "/static/files/books/2bac/math/20260920192151_ed24d5__02-_suites_num_riques_2_bac_smb_cover.png"
-        },
-        {
-          "title": "La fonction réciproque 2 BAC SMB",
-          "filename": "20260920192017_6a14b3__01-_la_fonction_r_ciproque_2_bac_smb.pdf",
-          "size": 18631706,
-          "modified": "2026-09-20T19:20:30",
-          "url": "/static/files/books/2bac/math/20260920192017_6a14b3__01-_la_fonction_r_ciproque_2_bac_smb.pdf",
-          "cover": "/static/files/books/2bac/math/20260920192017_6a14b3__01-_la_fonction_r_ciproque_2_bac_smb_cover.png"
-        },
-        {
           "title": "Maxi Math 2BAC SM  Tome 1",
           "filename": "20260910132608_456968_ilide.info-maxi-2bac-math-sm-tome-1.pdf",
           "size": 71152045,
@@ -420,14 +404,6 @@ window.INDEX = {
           "modified": "2026-09-07T14:18:58",
           "url": "/static/files/books/2bac/math/20260907131857_bfa2fd_maxi_2sm_-_tome_2.pdf",
           "cover": "/static/files/books/2bac/math/20260907131857_bfa2fd_maxi_2sm_-_tome_2_cover.png"
-        },
-        {
-          "title": "Resumé des cours 2bac sm - lydex benguerir",
-          "filename": "20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex.pdf",
-          "size": 7992732,
-          "modified": "2026-09-07T07:48:26",
-          "url": "/static/files/books/2bac/math/20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex.pdf",
-          "cover": "/static/files/books/2bac/math/20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex_cover.png"
         },
         {
           "title": "M. Aziz Afaadas 2BAC SM - Analyse",
@@ -462,12 +438,28 @@ window.INDEX = {
           "cover": "/static/files/books/2bac/math/20260907132011_44eb7f_maxi_math_2bac_pc_et_svt_tome_2_cover.png"
         },
         {
-          "title": "Dima Dima 2bac sm - Limites et continuité",
+          "title": "Limites et continuité - Dima Dima 2BAC SMB",
           "filename": "20260908202534_76dced__01-limite_et_continuit_-dima_dima-2_bac_sm.pdf",
           "size": 23052155,
           "modified": "2026-09-08T21:25:36",
           "url": "/static/files/books/2bac/math/20260908202534_76dced__01-limite_et_continuit_-dima_dima-2_bac_sm.pdf",
           "cover": "/static/files/books/2bac/math/20260908202534_76dced__01-limite_et_continuit_-dima_dima-2_bac_sm_cover.png"
+        },
+        {
+          "title": "La fonction réciproque - Dima Dima 2 BAC SMB",
+          "filename": "20260920192017_6a14b3__01-_la_fonction_r_ciproque_2_bac_smb.pdf",
+          "size": 18631706,
+          "modified": "2026-09-20T19:20:30",
+          "url": "/static/files/books/2bac/math/20260920192017_6a14b3__01-_la_fonction_r_ciproque_2_bac_smb.pdf",
+          "cover": "/static/files/books/2bac/math/20260920192017_6a14b3__01-_la_fonction_r_ciproque_2_bac_smb_cover.png"
+        },
+        {
+          "title": "Suites numériques - Dima Dima 2BAC SMB",
+          "filename": "20260920192151_ed24d5__02-_suites_num_riques_2_bac_smb.pdf",
+          "size": 18766102,
+          "modified": "2026-09-20T19:21:54",
+          "url": "/static/files/books/2bac/math/20260920192151_ed24d5__02-_suites_num_riques_2_bac_smb.pdf",
+          "cover": "/static/files/books/2bac/math/20260920192151_ed24d5__02-_suites_num_riques_2_bac_smb_cover.png"
         },
         {
           "title": "Ultra Math 2 Bac PC/SVT",
@@ -476,6 +468,14 @@ window.INDEX = {
           "modified": "2026-09-07T14:22:32",
           "url": "/static/files/books/2bac/math/20260907132231_c0dec1_ultra_math.pdf",
           "cover": "/static/files/books/2bac/math/20260907132231_c0dec1_ultra_math_cover.png"
+        },
+        {
+          "title": "Resumé des cours 2bac sm - lydex benguerir",
+          "filename": "20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex.pdf",
+          "size": 7992732,
+          "modified": "2026-09-07T07:48:26",
+          "url": "/static/files/books/2bac/math/20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex.pdf",
+          "cover": "/static/files/books/2bac/math/20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex_cover.png"
         }
       ],
       "pc": [
@@ -764,5 +764,5 @@ window.INDEX = {
       }
     ]
   },
-  "generated": "2026-09-20T19:21:52.480811"
+  "generated": "2026-09-20T20:07:21.397849"
 };
