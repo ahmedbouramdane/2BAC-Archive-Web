@@ -1,6 +1,22 @@
 {
   "documents": [
     {
+      "title": "Suites numériques 2BAC SMB",
+      "filename": "20260920192151_ed24d5__02-_suites_num_riques_2_bac_smb.pdf",
+      "size": 18766102,
+      "modified": "2026-09-20T19:21:54",
+      "url": "/static/files/books/2bac/math/20260920192151_ed24d5__02-_suites_num_riques_2_bac_smb.pdf",
+      "kind": "book"
+    },
+    {
+      "title": "La fonction réciproque 2 BAC SMB",
+      "filename": "20260920192017_6a14b3__01-_la_fonction_r_ciproque_2_bac_smb.pdf",
+      "size": 18631706,
+      "modified": "2026-09-20T19:20:30",
+      "url": "/static/files/books/2bac/math/20260920192017_6a14b3__01-_la_fonction_r_ciproque_2_bac_smb.pdf",
+      "kind": "book"
+    },
+    {
       "title": "Maxi Math 2BAC SM  Tome 1",
       "filename": "20260910132608_456968_ilide.info-maxi-2bac-math-sm-tome-1.pdf",
       "size": 71152045,
