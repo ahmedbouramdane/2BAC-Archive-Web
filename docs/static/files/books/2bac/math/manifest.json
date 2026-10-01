@@ -17,6 +17,14 @@
       "kind": "book"
     },
     {
+      "title": "Resumé des cours 2bac sm - lydex benguerir",
+      "filename": "20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex.pdf",
+      "size": 7992732,
+      "modified": "2026-09-07T06:48:24.149884",
+      "url": "/static/files/books/2bac/math/20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex.pdf",
+      "kind": "book"
+    },
+    {
       "title": "M. Aziz Afaadas 2BAC SM - Analyse",
       "filename": "20260906135503_2c86c9_aziz_afaadas_-_2_bac_sm_analyse.pdf",
       "size": 11733886,
@@ -78,14 +86,6 @@
       "size": 58059770,
       "modified": "2026-09-07T13:22:31.521792",
       "url": "/static/files/books/2bac/math/20260907132231_c0dec1_ultra_math.pdf",
-      "kind": "book"
-    },
-    {
-      "title": "Resumé des cours 2bac sm - lydex benguerir",
-      "filename": "20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex.pdf",
-      "size": 7992732,
-      "modified": "2026-09-07T06:48:24.149884",
-      "url": "/static/files/books/2bac/math/20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex.pdf",
       "kind": "book"
     }
   ]

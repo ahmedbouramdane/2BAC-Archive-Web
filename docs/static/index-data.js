@@ -11,14 +11,6 @@ window.INDEX = {
               "modified": "2026-09-05T17:21:44",
               "url": "/static/files/2bac/math/01/c/20260905162142_269c65_fontion_et_continuite2bsm.pdf",
               "cover": "/static/files/2bac/math/01/c/20260905162142_269c65_fontion_et_continuite2bsm_cover.png"
-            },
-            {
-              "title": "test just",
-              "filename": "20260905215858_aa3702_pi.pdf",
-              "size": 990891,
-              "modified": "2026-09-05T22:59:00",
-              "url": "/static/files/2bac/math/01/c/20260905215858_aa3702_pi.pdf",
-              "cover": "/static/files/2bac/math/01/c/20260905215858_aa3702_pi_cover.png"
             }
           ],
           "s": [
@@ -35,30 +27,66 @@ window.INDEX = {
         "02": {
           "c": [
             {
-              "title": "Suites numeriques 2 Bac SM",
-              "filename": "20260906133312_c37c72_suites_numeriques_2_bac_sm.pdf",
-              "size": 349574,
-              "modified": "2026-09-06T14:33:14",
-              "url": "/static/files/2bac/math/02/c/20260906133312_c37c72_suites_numeriques_2_bac_sm.pdf",
-              "cover": "/static/files/2bac/math/02/c/20260906133312_c37c72_suites_numeriques_2_bac_sm_cover.png"
+              "title": "Les suites 2 bac sm - resume",
+              "filename": "20261001213012_c5c5d5_resume-suites-numeriques-2bac-biof-sciences-mathematiques-1.pdf",
+              "size": 278853,
+              "modified": "2026-10-01T21:30:14",
+              "url": "/static/files/2bac/math/02/c/20261001213012_c5c5d5_resume-suites-numeriques-2bac-biof-sciences-mathematiques-1.pdf",
+              "cover": "/static/files/2bac/math/02/c/20261001213012_c5c5d5_resume-suites-numeriques-2bac-biof-sciences-mathematiques-1_cover.png"
             }
           ],
           "s": []
         },
         "03": {
-          "c": [],
+          "c": [
+            {
+              "title": "Derivation 2 BAC SM",
+              "filename": "20261001214336_f78b0a_resume-derivation-et-etude-des-fonctions-2bac-biof-sciences-mathematiques-1.pdf",
+              "size": 542010,
+              "modified": "2026-10-01T21:43:38",
+              "url": "/static/files/2bac/math/03/c/20261001214336_f78b0a_resume-derivation-et-etude-des-fonctions-2bac-biof-sciences-mathematiques-1.pdf",
+              "cover": "/static/files/2bac/math/03/c/20261001214336_f78b0a_resume-derivation-et-etude-des-fonctions-2bac-biof-sciences-mathematiques-1_cover.png"
+            }
+          ],
           "s": []
         },
         "04": {
-          "c": [],
+          "c": [
+            {
+              "title": "Fonctions Logarithmiques 2 BAC SM Resume",
+              "filename": "20261001215519_d8ec8e_resume-fonctions-logarithmiques.pdf",
+              "size": 186973,
+              "modified": "2026-10-01T21:55:20",
+              "url": "/static/files/2bac/math/04/c/20261001215519_d8ec8e_resume-fonctions-logarithmiques.pdf",
+              "cover": "/static/files/2bac/math/04/c/20261001215519_d8ec8e_resume-fonctions-logarithmiques_cover.png"
+            }
+          ],
           "s": []
         },
         "05": {
-          "c": [],
+          "c": [
+            {
+              "title": "Fonctions exponentielles 2 BAC SM - Resume",
+              "filename": "20261001215556_74d7a2_resume-fonctions-exponentielles-2bac-biof-sciences-mathematiques-1.pdf",
+              "size": 193522,
+              "modified": "2026-10-01T21:55:58",
+              "url": "/static/files/2bac/math/05/c/20261001215556_74d7a2_resume-fonctions-exponentielles-2bac-biof-sciences-mathematiques-1.pdf",
+              "cover": "/static/files/2bac/math/05/c/20261001215556_74d7a2_resume-fonctions-exponentielles-2bac-biof-sciences-mathematiques-1_cover.png"
+            }
+          ],
           "s": []
         },
         "06": {
-          "c": [],
+          "c": [
+            {
+              "title": "Les Nombres Complexes 2 BAC SM - Resume",
+              "filename": "20261001220324_4deb7f_nombres_complexes.pdf",
+              "size": 224555,
+              "modified": "2026-10-01T22:03:26",
+              "url": "/static/files/2bac/math/06/c/20261001220324_4deb7f_nombres_complexes.pdf",
+              "cover": "/static/files/2bac/math/06/c/20261001220324_4deb7f_nombres_complexes_cover.png"
+            }
+          ],
           "s": []
         },
         "07": {
@@ -406,6 +434,14 @@ window.INDEX = {
           "cover": "/static/files/books/2bac/math/20260907131857_bfa2fd_maxi_2sm_-_tome_2_cover.png"
         },
         {
+          "title": "Resumé des cours 2bac sm - lydex benguerir",
+          "filename": "20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex.pdf",
+          "size": 7992732,
+          "modified": "2026-09-07T07:48:26",
+          "url": "/static/files/books/2bac/math/20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex.pdf",
+          "cover": "/static/files/books/2bac/math/20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex_cover.png"
+        },
+        {
           "title": "M. Aziz Afaadas 2BAC SM - Analyse",
           "filename": "20260906135503_2c86c9_aziz_afaadas_-_2_bac_sm_analyse.pdf",
           "size": 11733886,
@@ -468,14 +504,6 @@ window.INDEX = {
           "modified": "2026-09-07T14:22:32",
           "url": "/static/files/books/2bac/math/20260907132231_c0dec1_ultra_math.pdf",
           "cover": "/static/files/books/2bac/math/20260907132231_c0dec1_ultra_math_cover.png"
-        },
-        {
-          "title": "Resumé des cours 2bac sm - lydex benguerir",
-          "filename": "20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex.pdf",
-          "size": 7992732,
-          "modified": "2026-09-07T07:48:26",
-          "url": "/static/files/books/2bac/math/20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex.pdf",
-          "cover": "/static/files/books/2bac/math/20260907064824_1b85f7_des-cours-maths-2bac-sm-lydex_cover.png"
         }
       ],
       "pc": [
@@ -764,5 +792,5 @@ window.INDEX = {
       }
     ]
   },
-  "generated": "2026-09-20T20:07:21.397849"
+  "generated": "2026-10-01T22:03:24.734760"
 };
